@@ -1,0 +1,79 @@
+:root{
+  --z-back: -10;
+  --z-normal: 1;
+  --z-tooltip: 10;
+  --z-fixed: 100;
+  --z-modal: 1000;
+  --body-font: "Poppins", sans-serif;
+  --title-font: "Playfair Display", serif;
+  --ceramic: #cdcdc0;
+  --ceramic-two: #cdcdc0c9;
+  --slate: #626d71;
+  --slate-two: #5a6062;
+  --latte: #ddbc95;
+  --coffe: #b38867;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-size: 16px;
+  font-family: var(--body-font);
+  min-height: 100vh;
+  background-image: url(../img/loby_bg_min.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+
+
+/* Estilos para el preload */
+.preloader{
+  display: none;
+  position: fixed;
+  z-index: var(--z-modal);
+  /* padding-top: 100px; */
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: auto;
+  background-color: var(--slate);
+}
+
+.preloader.show{
+  display: block;
+}
+
+.loader{
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  width: 70px;
+  height: 70px;
+  border: 10px solid var(--ceramic);
+  border-top: 10px solid var(--latte);
+  border-radius: 50%;
+  animation-name: rotate;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+@keyframes rotate{
+  from{
+    transform: rotate(0);
+  }
+  to{
+    transform: rotate(360deg);
+  }
+}
