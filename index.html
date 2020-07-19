@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mi Banco</title>
 
+    <link rel="shortcut icon" href="./img/bank.svg" type="image/x-svg" />
     <!-- Familias tipograficas -->
     <link
       href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@400;500;800&display=swap"
@@ -21,11 +22,77 @@
     />
 
     <!-- Estilos personalizados -->
-    <link rel="stylesheet" href="./css/main.css">
+    <link rel="stylesheet" href="./css/main.css" />
   </head>
   <body>
     <div class="preloader show" id="preload">
       <div class="loader"></div>
+    </div>
+
+    <div id="app">
+      
+      <!-- Loby de la aplicacion -->
+      <div class="loby">
+        <div class="loby-card">
+          <header class="loby-card__header">
+            <h1 class="loby-card__title">Mi Banco</h1>
+          </header>
+          <!-- Fin del header -->
+          <div class="loby-card__content">
+            <p class="loby-card__info">
+              Para iniciar una partida escribe tu nombre y una contraseña
+            </p>
+
+            <div class="loby-card__form">
+              <figure class="loby-card__fig">
+                <img
+                  src="./img/TioMacPato.png"
+                  alt="Pato bonachon y tacaño"
+                  class="loby-card__img"
+                />
+              </figure>
+
+              <div class="loby-card__inputs">
+                <input
+                  type="text"
+                  class="form__input error"
+                  name="bankerName"
+                  placeholder="Escribe tu nombre"
+                />
+                <span class="alert alert--danger show"
+                  >Nombre demasiado corto</span
+                >
+                <input
+                  type="password"
+                  class="form__input"
+                  name="bankerPassword"
+                  placeholder="Contraseña"
+                />
+                <span class="alert alert--danger show"
+                  >Este campo es obligatorio</span
+                >
+                <input
+                  type="button"
+                  value="Iniciar Partida"
+                  class="btn btn--late"
+                />
+              </div>
+              <!--Fin del formulario-->
+            </div>
+            <!--Fin del loby__form-->
+          </div>
+          <!--Fin de content-->
+
+          <footer class="loby-card__footer">
+            <p class="copy">Creado por: <span class="txt-bold">Andrés</span></p>
+            <p class="copy">v-1.0</p>
+          </footer>
+        </div>
+        <!--Fin de loby-card-->
+      </div>
+      <!-- Fin del loby de la aplicacion -->
+
+      <!-- Icons made by <a href="https://creativemarket.com/eucalyp" title="Eucalyp">Eucalyp</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a> -->
     </div>
 
     <!-- Librería de Vue.js para desarrolladores -->
