@@ -528,7 +528,62 @@
             </div>
 
             <span class="alert alert--big alert--success show">Premio entregado</span>
-            <button class="btn btn--success">Entrgar premio</button>
+            <button class="btn btn--success">Entregar premio</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cobro de impuestos -->
+      <div class="taxes">
+        <div class="container">
+          <div class="container__header">
+            <h1 class="container__title">Impuestos</h1>
+          </div>
+          <div class="container__content">
+            <!-- Seleccion del departamento de impuesto -->
+            <label for="taxType" class="form__label">Departamento de impuesto</label>
+            <select name="taxType" id="taxType" class="form__input">
+              <option value="" selected disabled>Selecciona al departamento</option>
+              <option value="1">Banco</option>
+              <option value="1">Tierra de la Fantasía</option>
+              <option value="1">Tierra de la Aventura</option>
+              <option value="1">Tierra de la frontera</option>
+            </select>
+
+            <!-- Ingresa el valor del impuesto -->
+            <label for="taxAmount" class="form__label text-center">Valor a cobrar</label>
+            <input type="text" name="taxAmount" id="taxAmount" class="form__input text-right" placeholder="$0">
+            <span class="alert alert--danger show">Ingresa un valor valido</span>
+
+            <span class="alert alert--big alert--danger show">Saldo Insuficiente</span>
+            <button class="btn btn--success">Cobrar Impuesto</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="loot">
+        <div class="container">
+          <div class="container__header">
+            <h1 class="container__title">Cobrar Botín</h1>
+          </div>
+          <div class="container__content">
+            <!-- Seleccion del departamento de impuesto -->
+            <label for="lootType" class="form__label">Departamento a saquear</label>
+            <select name="lootType" id="lootType" class="form__input">
+              <option value="" selected disabled>Selecciona al departamento</option>
+              <option value="1">Banco</option>
+              <option value="1">Tierra de la Fantasía</option>
+              <option value="1">Tierra de la Aventura</option>
+              <option value="1">Tierra de la frontera</option>
+            </select>
+
+            <!-- Ingresa el valor del impuesto -->
+            <label for="lootAmount" class="form__label text-center">Valor a saquear</label>
+            <input type="text" name="lootAmount" id="lootAmount" class="form__input text-right" placeholder="$0">
+            <span class="alert alert--danger show">Ingresa un valor valido</span>
+
+            <span class="alert alert--big alert--success show">Saqueo Exitoso</span>
+            <button class="btn btn--success">Saquear</button>
           </div>
         </div>
       </div>
