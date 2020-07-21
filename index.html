@@ -349,6 +349,40 @@
       </div>
       <!-- Fin de dashboard -->
 
+      <div class="transfer">
+        <div class="container">
+          <header class="container__header">
+            <h1 class="container__title">Transferencia de Dinero</h1>
+          </header>
+          <div class="container__content">
+            <!-- Remitente -->
+            <label for="transferSender" class="form__label">Remitente</label>
+            <select name="transferSender" id="transferSender" class="form__input">
+              <option value="" selected disabled>Selecciona un remitente</option>
+              <option value="1" >Jugador x</option>
+            </select>
+            <span class="alert alert--danger show">Se debe seleccionar un remitente</span>
+
+            <!-- Destinatario -->
+            <label for="transferAddressed" class="form__label" title="sdsdsd">Destinatario</label>
+            <select name="transferAddressed" id="transferAddressed" class="form__input">
+              <option value="" disabled selected>Selecciona un destinatario</option>
+              <option value="2">Jugador y</option>
+            </select>
+            <span class="alert alert--danger show">Se debe seleccionar un destinatario</span>
+
+            <!-- Monto a transferir -->
+            <label for="transferAmount" class="form__label text-center">Monto a transferir</label>
+            <input type="text" name="transferAmount" id="transferAmount" class="form__input text-right" placeholder="$0">
+            <span class="alert alert--danger show">Ingresa un valor valido</span>
+
+            <span class="alert alert--big alert--success show">Monto transferido</span>
+
+            <button class="btn btn--success">Hacer Transferencia</button>
+          </div>
+        </div>
+      </div>
+
       <!-- Icons made by <a href="https://creativemarket.com/eucalyp" title="Eucalyp">Eucalyp</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a> -->
     </div>
 
