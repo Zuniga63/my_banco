@@ -57,6 +57,14 @@ body {
   text-align: right;
 }
 
+.m-b{
+  margin-bottom: 0.5em;
+}
+
+.m-b-1{
+  margin-bottom: 1em;
+}
+
 /* --------------------------------------------------------------------------------- */
 /*        ESTILOS GENRALES PARA LOS BOTONES                                          */
 /* --------------------------------------------------------------------------------- */
@@ -173,6 +181,21 @@ body {
 /* --------------------------------------------------------------------------------- */
 /*        ESTILOS GENRALES PARA FORMULARIOS                                          */
 /* --------------------------------------------------------------------------------- */
+
+.form__group{
+  display: flex;
+  justify-content: space-between;
+  background-color: var(--slate);
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--dark-two);
+  border-radius: 5px;
+  color:var(--light);
+  letter-spacing: 2px;
+}
+
+.form__radio{
+  vertical-align: middle;
+}
 
 .form__label,
 .form__input {

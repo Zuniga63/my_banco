@@ -349,6 +349,7 @@
       </div>
       <!-- Fin de dashboard -->
 
+      <!-- Tansferencia de efectivo -->
       <div class="transfer">
         <div class="container">
           <header class="container__header">
@@ -379,6 +380,49 @@
             <span class="alert alert--big alert--success show">Monto transferido</span>
 
             <button class="btn btn--success">Hacer Transferencia</button>
+          </div>
+        </div>
+        <!-- Fin del container -->
+      </div>
+
+      <!-- Transacciones -->
+      <div class="transactions">
+        <div class="container">
+          <div class="container__header">
+            <h1 class="container__title">Transacciones</h1>
+          </div>
+          <div class="container__content">
+            <!-- Seleccion del tipo de transaccion -->
+            <label class="form__label">Tipo de transacción</label>
+            <div class="form__group m-b">
+              <!-- Deposito -->
+              <div class="radio-group">
+                <input type="radio" name="transacctionType" id="deposit" class="form__radio">
+                <label for="deposit">Deposito</label>
+              </div>
+              <!-- Retiro -->
+              <div class="radio-group">
+                <input type="radio" name="transacctionType" id="whitdrawal" class="form__radio">
+                <label for="whitdrawal">Retiro</label>
+              </div>
+            </div>
+
+            <!-- Seleccion del titular -->
+            <label for="transactionAcount" class="form__label">Titular de la cuenta</label>
+            <select name="transactionAcount" id="transactionAcount" class="form__input">
+              <option value="" selected disabled>Selecciona un jugador</option>
+              <option value="1">Jugador X</option>
+              <option value="2">Jugador Y</option>
+            </select>
+            <span class="alert alert--danger show">Se debe seleccionar al titular</span>
+
+            <!-- Importe de la transaccion -->
+            <label for="transactionAmount" class="form__label text-center">Valor de la transacción</label>
+            <input type="text" name="transactionAmount" id="transactionAmount" class="form__input text-right error" placeholder="$0">
+            <span class="alert alert--danger show">Ingresa un valor valido</span>
+
+            <span class="alert alert--big alert--danger show">Fondos Insuficientes</span>
+            <button class="btn btn--success">Realizar transaccion</button>
           </div>
         </div>
       </div>
