@@ -271,6 +271,7 @@ class Player extends Acount {
     this.name = name;
     this.password = password;
     this.awards = new Awards();
+    this.awardsCount = 0;
   }
 
   /**
