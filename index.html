@@ -30,51 +30,8 @@
     </div>
 
     <div id="app">
-      <!-- Header con la barra de avegacion -->
-      <header class="header">
-        <div class="main-nav">
-          <img
-            src="./img/bank.svg"
-            alt="Logo de la aplicacion"
-            class="main-nav__brand"
-          />
-          <nav class="main-nav__nav">
-            <ul class="main-nav__list">
-              <li class="main-nav__item">
-                <a href="#" class="main_nav__link main-nav__link--active">
-                  <span class="main-nav__link__prepend">i</span>
-                  <span class="main-nav__link__content">Link 1</span>
-                </a>
-              </li>
-
-              <li class="main-nav__item">
-                <a href="#" class="main_nav__link">
-                  <span class="main-nav__link__prepend">i</span>
-                  <span class="main-nav__link__content">Link 2</span>
-                </a>
-              </li>
-
-              <li class="main-nav__item">
-                <a href="#" class="main_nav__link main-nav__link--disabled">
-                  <span class="main-nav__link__prepend">i</span>
-                  <span class="main-nav__link__content">Link 3</span>
-                </a>
-              </li>
-            </ul>
-
-            <button class="btn btn--danger">Reiniciar</button>
-          </nav>
-          <!--Fin de main-nav-nav-->
-
-          <button class="main-nav__toggler">
-            <i class="fas fa-bars"></i>
-          </button>
-        </div>
-        <!--Fin de main-nav-->
-      </header>
-
       <!-- Loby de la aplicacion -->
-      <div class="loby">
+      <div class="loby" v-if="loby.visibility">
         <div class="loby-card">
           <header class="loby-card__header">
             <h1 class="loby-card__title">Mi Banco</h1>
@@ -97,26 +54,32 @@
               <div class="loby-card__inputs">
                 <input
                   type="text"
-                  class="form__input error"
+                  :class="['form__input', {error : loby.bankerNameState.hasError}]"
                   name="bankerName"
+                  v-model.trim="loby.bankerName"
                   placeholder="Escribe tu nombre"
+                  @blur="validateBankerName"
                 />
-                <span class="alert alert--danger show"
-                  >Nombre demasiado corto</span
+                <span :class="['alert', 'alert--danger', {show: loby.bankerNameState.hasError}]"
+                  >{{loby.bankerNameState.message}}</span
                 >
                 <input
                   type="password"
-                  class="form__input"
+                  :class="['form__input', {error: loby.passwordState.hasError}]"
                   name="bankerPassword"
+                  v-model.trim="loby.password"
                   placeholder="Contraseña"
+                  @blur="validateBankerPassword"
                 />
-                <span class="alert alert--danger show"
-                  >Este campo es obligatorio</span
+                <span :class="['alert', 'alert--danger', {show: loby.passwordState.hasError}]"
+                  >{{loby.passwordState.message}}</span
                 >
                 <input
                   type="button"
                   value="Iniciar Partida"
-                  class="btn btn--late"
+                  :class="['btn', {'btn--late': lobyCorrect, 'btn--disable': !lobyCorrect}]"
+                  :disabled = "!lobyCorrect"
+                  @click="startNewGame"
                 />
               </div>
               <!--Fin del formulario-->
@@ -126,464 +89,693 @@
           <!--Fin de content-->
 
           <footer class="loby-card__footer">
-            <p class="copy">Creado por: <span class="txt-bold">Andrés</span></p>
-            <p class="copy">v-1.0</p>
+            <p class="copy">Creado por: <span class="text-bold">{{author}}</span></p>
+            <p class="copy">v-{{version}}</p>
           </footer>
         </div>
         <!--Fin de loby-card-->
       </div>
       <!-- Fin del loby de la aplicacion -->
 
-      <div class="dashboard">
-        <!-- Container con los parametros  generales -->
-        <div class="container">
-          <header class="container__header">
-            <h1 class="container__title">Panel de control</h1>
-            <p class="container__subtitle">
-              Banquero: <span class="text-bold">Andrés Felipe</span>
-            </p>
-          </header>
-          <div class="container__content">
-            <div class="dashboard__money">
-              <!-- Dinero en la caja fuerte -->
-              <div class="box-money">
-                <p class="box-money__title">Caja Fuerte</p>
-                <p class="box-money__money text-bold">$200.000</p>
-              </div>
-              <!-- Dinero en cicrlulacion -->
-              <div class="box-money">
-                <p class="box-money__title">Circulacion</p>
-                <p class="box-money__money text-bold">$100.000</p>
-              </div>
-              <!-- Dinero propio del banco -->
-              <div class="box-money">
-                <p class="box-money__title">Capital</p>
-                <p class="box-money__money text-bold">$150.000</p>
-              </div>
-              <!-- Dinero correspondiente a los jugadores -->
-              <div class="box-money">
-                <p class="box-money__title">Jugadores (2)</p>
-                <p class="box-money__money text-bold">$50.000</p>
-              </div>
-            </div>
+      <div class="home" v-if="!loby.visibility">
+        <!-- Header con la barra de avegacion -->
+        <header class="header">
+          <div class="main-nav">
+            <img
+              src="./img/bank.svg"
+              alt="Logo de la aplicacion"
+              class="main-nav__brand"
+            />
+            <nav class="main-nav__nav">
+              <ul class="main-nav__list">
+                <li class="main-nav__item">
+                  <a href="#" class="main_nav__link main-nav__link--active">
+                    <span class="main-nav__link__prepend">i</span>
+                    <span class="main-nav__link__content">Link 1</span>
+                  </a>
+                </li>
+
+                <li class="main-nav__item">
+                  <a href="#" class="main_nav__link">
+                    <span class="main-nav__link__prepend">i</span>
+                    <span class="main-nav__link__content">Link 2</span>
+                  </a>
+                </li>
+
+                <li class="main-nav__item">
+                  <a href="#" class="main_nav__link main-nav__link--disabled">
+                    <span class="main-nav__link__prepend">i</span>
+                    <span class="main-nav__link__content">Link 3</span>
+                  </a>
+                </li>
+              </ul>
+
+              <button class="btn btn--danger">Reiniciar</button>
+            </nav>
+            <!--Fin de main-nav-nav-->
+
+            <button class="main-nav__toggler">
+              <i class="fas fa-bars"></i>
+            </button>
           </div>
-          <footer class="container__actions">
-            <button class="btn btn--success">Nuevo Jugador</button>
-          </footer>
-        </div>
-        <!-- Fin de container principal -->
-        <div class="container">
-          <header class="container__header">
-            <h2 class="container__title">Otros</h2>
-          </header>
-          <div class="container__content">
-            <button class="tab-button active">Jugadores</button>
-            <button class="tab-button">Aduanas</button>
-            <button class="tab-button">Estadisticas</button>
-            <!-- TARJETAS DE JUGADORES -->
-            <div class="tab">
-              <div class="players-cards">
-                <div class="player-card">
-                  <div class="player-card__name">Jugador2</div>
-                  <div class="player-card__content">
-                    <!-- Seccion del dinero -->
-                    <div class="player-card__section">
-                      <p class="player-card__money">$26.400</p>
-                    </div>
-                    <!-- Seccion de estadisticas -->
-                    <div class="player-card__section">
-                      <p class="player-card__info">
-                        Trans.: <span class="text-bold">0</span>
-                      </p>
-                      <p class="player-card__info">
-                        Premios: <span class="text-bold">0</span>
-                      </p>
-                    </div>
-                  </div>
-                  <div class="player-card__actions">
-                    <button class="btn btn--success">Pagar Sueldo</button>
-                  </div>
-                  <button class="player-card__delete">X</button>
-                </div>
+          <!--Fin de main-nav-->
+        </header>
 
-                <div class="player-card">
-                  <div class="player-card__name">Jugador2</div>
-                  <div class="player-card__content">
-                    <!-- Seccion del dinero -->
-                    <div class="player-card__section">
-                      <p class="player-card__money">$26.400</p>
-                    </div>
-                    <!-- Seccion de estadisticas -->
-                    <div class="player-card__section">
-                      <p class="player-card__info">
-                        Trans.: <span class="text-bold">0</span>
-                      </p>
-                      <p class="player-card__info">
-                        Premios: <span class="text-bold">0</span>
-                      </p>
-                    </div>
-                  </div>
-                  <div class="player-card__actions">
-                    <button class="btn btn--success">Pagar Sueldo</button>
-                  </div>
-                  <button class="player-card__delete">X</button>
+        <div class="dashboard">
+          <!-- Container con los parametros  generales -->
+          <div class="container">
+            <header class="container__header">
+              <h1 class="container__title">Panel de control</h1>
+              <p class="container__subtitle">
+                Banquero: <span class="text-bold">Andrés Felipe</span>
+              </p>
+            </header>
+            <div class="container__content">
+              <div class="dashboard__money">
+                <!-- Dinero en la caja fuerte -->
+                <div class="box-money">
+                  <p class="box-money__title">Caja Fuerte</p>
+                  <p class="box-money__money text-bold">$200.000</p>
                 </div>
-
-                <div class="player-card">
-                  <div class="player-card__name">Jugador2</div>
-                  <div class="player-card__content">
-                    <!-- Seccion del dinero -->
-                    <div class="player-card__section">
-                      <p class="player-card__money">$26.400</p>
-                    </div>
-                    <!-- Seccion de estadisticas -->
-                    <div class="player-card__section">
-                      <p class="player-card__info">
-                        Trans.: <span class="text-bold">0</span>
-                      </p>
-                      <p class="player-card__info">
-                        Premios: <span class="text-bold">0</span>
-                      </p>
-                    </div>
-                  </div>
-                  <div class="player-card__actions">
-                    <button class="btn btn--success">Pagar Sueldo</button>
-                  </div>
-                  <button class="player-card__delete">X</button>
+                <!-- Dinero en cicrlulacion -->
+                <div class="box-money">
+                  <p class="box-money__title">Circulacion</p>
+                  <p class="box-money__money text-bold">$100.000</p>
                 </div>
-
-                <div class="player-card">
-                  <div class="player-card__name">Jugador2</div>
-                  <div class="player-card__content">
-                    <!-- Seccion del dinero -->
-                    <div class="player-card__section">
-                      <p class="player-card__money">$26.400</p>
-                    </div>
-                    <!-- Seccion de estadisticas -->
-                    <div class="player-card__section">
-                      <p class="player-card__info">
-                        Trans.: <span class="text-bold">0</span>
-                      </p>
-                      <p class="player-card__info">
-                        Premios: <span class="text-bold">0</span>
-                      </p>
-                    </div>
-                  </div>
-                  <div class="player-card__actions">
-                    <button class="btn btn--success">Pagar Sueldo</button>
-                  </div>
-                  <button class="player-card__delete">X</button>
+                <!-- Dinero propio del banco -->
+                <div class="box-money">
+                  <p class="box-money__title">Capital</p>
+                  <p class="box-money__money text-bold">$150.000</p>
+                </div>
+                <!-- Dinero correspondiente a los jugadores -->
+                <div class="box-money">
+                  <p class="box-money__title">Jugadores (2)</p>
+                  <p class="box-money__money text-bold">$50.000</p>
                 </div>
               </div>
-              <div class="tab__footer">
-                Total: <span class="text-bold">5</span>
-              </div>
             </div>
+            <footer class="container__actions">
+              <button class="btn btn--success">Nuevo Jugador</button>
+            </footer>
+          </div>
+          <!-- Fin de container principal -->
+          <div class="container">
+            <header class="container__header">
+              <h2 class="container__title">Otros</h2>
+            </header>
+            <div class="container__content">
+              <button class="tab-button active">Jugadores</button>
+              <button class="tab-button">Aduanas</button>
+              <button class="tab-button">Estadisticas</button>
+              <!-- TARJETAS DE JUGADORES -->
+              <div class="tab">
+                <div class="players-cards">
+                  <div class="player-card">
+                    <div class="player-card__name">Jugador2</div>
+                    <div class="player-card__content">
+                      <!-- Seccion del dinero -->
+                      <div class="player-card__section">
+                        <p class="player-card__money">$26.400</p>
+                      </div>
+                      <!-- Seccion de estadisticas -->
+                      <div class="player-card__section">
+                        <p class="player-card__info">
+                          Trans.: <span class="text-bold">0</span>
+                        </p>
+                        <p class="player-card__info">
+                          Premios: <span class="text-bold">0</span>
+                        </p>
+                      </div>
+                    </div>
+                    <div class="player-card__actions">
+                      <button class="btn btn--success">Pagar Sueldo</button>
+                    </div>
+                    <button class="player-card__delete">X</button>
+                  </div>
 
-            <!-- Informacion de aduanas -->
-            <div class="tab">
-              <div class="dashboard-card">
-                <h2 class="dashboard-card__title">Departamento de Aduanas</h2>
-                <div class="dashboard-card__body">
-                  <p class="dashboard-card__section">
-                    Tierra de la frontera: <span class="text-bold">$0</span>
-                  </p>
-                  <p class="dashboard-card__section">
-                    Tierra del futuro: <span class="text-bold">$0</span>
-                  </p>
-                  <p class="dashboard-card__section">
-                    Tierra de la aventura: <span class="text-bold">$0</span>
+                  <div class="player-card">
+                    <div class="player-card__name">Jugador2</div>
+                    <div class="player-card__content">
+                      <!-- Seccion del dinero -->
+                      <div class="player-card__section">
+                        <p class="player-card__money">$26.400</p>
+                      </div>
+                      <!-- Seccion de estadisticas -->
+                      <div class="player-card__section">
+                        <p class="player-card__info">
+                          Trans.: <span class="text-bold">0</span>
+                        </p>
+                        <p class="player-card__info">
+                          Premios: <span class="text-bold">0</span>
+                        </p>
+                      </div>
+                    </div>
+                    <div class="player-card__actions">
+                      <button class="btn btn--success">Pagar Sueldo</button>
+                    </div>
+                    <button class="player-card__delete">X</button>
+                  </div>
+
+                  <div class="player-card">
+                    <div class="player-card__name">Jugador2</div>
+                    <div class="player-card__content">
+                      <!-- Seccion del dinero -->
+                      <div class="player-card__section">
+                        <p class="player-card__money">$26.400</p>
+                      </div>
+                      <!-- Seccion de estadisticas -->
+                      <div class="player-card__section">
+                        <p class="player-card__info">
+                          Trans.: <span class="text-bold">0</span>
+                        </p>
+                        <p class="player-card__info">
+                          Premios: <span class="text-bold">0</span>
+                        </p>
+                      </div>
+                    </div>
+                    <div class="player-card__actions">
+                      <button class="btn btn--success">Pagar Sueldo</button>
+                    </div>
+                    <button class="player-card__delete">X</button>
+                  </div>
+
+                  <div class="player-card">
+                    <div class="player-card__name">Jugador2</div>
+                    <div class="player-card__content">
+                      <!-- Seccion del dinero -->
+                      <div class="player-card__section">
+                        <p class="player-card__money">$26.400</p>
+                      </div>
+                      <!-- Seccion de estadisticas -->
+                      <div class="player-card__section">
+                        <p class="player-card__info">
+                          Trans.: <span class="text-bold">0</span>
+                        </p>
+                        <p class="player-card__info">
+                          Premios: <span class="text-bold">0</span>
+                        </p>
+                      </div>
+                    </div>
+                    <div class="player-card__actions">
+                      <button class="btn btn--success">Pagar Sueldo</button>
+                    </div>
+                    <button class="player-card__delete">X</button>
+                  </div>
+                </div>
+                <div class="tab__footer">
+                  Total: <span class="text-bold">5</span>
+                </div>
+              </div>
+
+              <!-- Informacion de aduanas -->
+              <div class="tab">
+                <div class="dashboard-card">
+                  <h2 class="dashboard-card__title">Departamento de Aduanas</h2>
+                  <div class="dashboard-card__body">
+                    <p class="dashboard-card__section">
+                      Tierra de la frontera: <span class="text-bold">$0</span>
+                    </p>
+                    <p class="dashboard-card__section">
+                      Tierra del futuro: <span class="text-bold">$0</span>
+                    </p>
+                    <p class="dashboard-card__section">
+                      Tierra de la aventura: <span class="text-bold">$0</span>
+                    </p>
+                  </div>
+                  <!-- Fin del body -->
+                  <p class="dashboard-card__footer">
+                    Dinero: <span class="text-bold">$0</span>
                   </p>
                 </div>
-                <!-- Fin del body -->
-                <p class="dashboard-card__footer">
-                  Dinero: <span class="text-bold">$0</span>
-                </p>
+                <!-- Fin de la tarjeta -->
               </div>
-              <!-- Fin de la tarjeta -->
-            </div>
 
-            <!-- Estadisticas generales -->
-            <div class="tab">
-              <div class="dashboard-card">
-                <h2 class="dashboard-card__title">Estadisticas</h2>
-                <div class="dashboard-card__body">
-                  <p class="dashboard-card__section">
-                    Jugadores: <span class="text-bold">0</span>
-                  </p>
-                  <p class="dashboard-card__section">
-                    El mas rico: <span class="text-bold">Jugador x</span>
-                  </p>
-                  <p class="dashboard-card__section">
-                    El más premiado: <span class="text-bold">Jugador x</span>
-                  </p>
-                  <p class="dashboard-card__section">
-                    El más afortunado: <span class="text-bold">Jugador x</span>
-                  </p>
-                  <p class="dashboard-card__section dashboard-card__section--bread" >Premios</p>
-                  <p class="dashboard-card__section">
-                    Bambi (1): <span class="text-bold">$2500</span>
-                  </p>
-                  <p class="dashboard-card__section">
-                    Daisy (1): <span class="text-bold">$2500</span>
-                  </p>
-                  <p class="dashboard-card__section">
-                    Pinocho (1): <span class="text-bold">$2500</span>
-                  </p>
-                  <p class="dashboard-card__section">
-                    Cenicienta (1): <span class="text-bold">$250.000</span>
-                  </p>
-                  <p class="dashboard-card__section">
-                    Botín (1): <span class="text-bold">$250.000</span>
+              <!-- Estadisticas generales -->
+              <div class="tab">
+                <div class="dashboard-card">
+                  <h2 class="dashboard-card__title">Estadisticas</h2>
+                  <div class="dashboard-card__body">
+                    <p class="dashboard-card__section">
+                      Jugadores: <span class="text-bold">0</span>
+                    </p>
+                    <p class="dashboard-card__section">
+                      El mas rico: <span class="text-bold">Jugador x</span>
+                    </p>
+                    <p class="dashboard-card__section">
+                      El más premiado: <span class="text-bold">Jugador x</span>
+                    </p>
+                    <p class="dashboard-card__section">
+                      El más afortunado:
+                      <span class="text-bold">Jugador x</span>
+                    </p>
+                    <p
+                      class="dashboard-card__section dashboard-card__section--bread"
+                    >
+                      Premios
+                    </p>
+                    <p class="dashboard-card__section">
+                      Bambi (1): <span class="text-bold">$2500</span>
+                    </p>
+                    <p class="dashboard-card__section">
+                      Daisy (1): <span class="text-bold">$2500</span>
+                    </p>
+                    <p class="dashboard-card__section">
+                      Pinocho (1): <span class="text-bold">$2500</span>
+                    </p>
+                    <p class="dashboard-card__section">
+                      Cenicienta (1): <span class="text-bold">$250.000</span>
+                    </p>
+                    <p class="dashboard-card__section">
+                      Botín (1): <span class="text-bold">$250.000</span>
+                    </p>
+                  </div>
+                  <!-- Fin del body -->
+                  <p class="dashboard-card__footer">
+                    Estadisticas poco relevantes hasta acabar el juego
                   </p>
                 </div>
-                <!-- Fin del body -->
-                <p class="dashboard-card__footer">
-                  Estadisticas poco relevantes hasta acabar el juego
-                </p>
+                <!-- Fin de la tarjeta -->
               </div>
-              <!-- Fin de la tarjeta -->
+            </div>
+          </div>
+        </div>
+        <!-- Fin de dashboard -->
+
+        <!-- Tansferencia de efectivo -->
+        <div class="transfer">
+          <div class="container">
+            <header class="container__header">
+              <h1 class="container__title">Transferencia de Dinero</h1>
+            </header>
+            <div class="container__content">
+              <!-- Remitente -->
+              <label for="transferSender" class="form__label">Remitente</label>
+              <select
+                name="transferSender"
+                id="transferSender"
+                class="form__input"
+              >
+                <option value="" selected disabled
+                  >Selecciona un remitente</option
+                >
+                <option value="1">Jugador x</option>
+              </select>
+              <span class="alert alert--danger show"
+                >Se debe seleccionar un remitente</span
+              >
+
+              <!-- Destinatario -->
+              <label for="transferAddressed" class="form__label" title="sdsdsd"
+                >Destinatario</label
+              >
+              <select
+                name="transferAddressed"
+                id="transferAddressed"
+                class="form__input"
+              >
+                <option value="" disabled selected
+                  >Selecciona un destinatario</option
+                >
+                <option value="2">Jugador y</option>
+              </select>
+              <span class="alert alert--danger show"
+                >Se debe seleccionar un destinatario</span
+              >
+
+              <!-- Monto a transferir -->
+              <label for="transferAmount" class="form__label text-center"
+                >Monto a transferir</label
+              >
+              <input
+                type="text"
+                name="transferAmount"
+                id="transferAmount"
+                class="form__input text-right"
+                placeholder="$0"
+              />
+              <span class="alert alert--danger show"
+                >Ingresa un valor valido</span
+              >
+
+              <span class="alert alert--big alert--success show"
+                >Monto transferido</span
+              >
+
+              <button class="btn btn--success">Hacer Transferencia</button>
+            </div>
+          </div>
+          <!-- Fin del container -->
+        </div>
+
+        <!-- Transacciones -->
+        <div class="transactions">
+          <div class="container">
+            <div class="container__header">
+              <h1 class="container__title">Transacciones</h1>
+            </div>
+            <div class="container__content">
+              <!-- Seleccion del tipo de transaccion -->
+              <label class="form__label">Tipo de transacción</label>
+              <div class="form__group m-b">
+                <!-- Deposito -->
+                <div class="radio-group">
+                  <input
+                    type="radio"
+                    name="transacctionType"
+                    id="deposit"
+                    class="form__radio"
+                  />
+                  <label for="deposit">Deposito</label>
+                </div>
+                <!-- Retiro -->
+                <div class="radio-group">
+                  <input
+                    type="radio"
+                    name="transacctionType"
+                    id="whitdrawal"
+                    class="form__radio"
+                  />
+                  <label for="whitdrawal">Retiro</label>
+                </div>
+              </div>
+
+              <!-- Seleccion del titular -->
+              <label for="transactionAcount" class="form__label"
+                >Titular de la cuenta</label
+              >
+              <select
+                name="transactionAcount"
+                id="transactionAcount"
+                class="form__input"
+              >
+                <option value="" selected disabled
+                  >Selecciona un jugador</option
+                >
+                <option value="1">Jugador X</option>
+                <option value="2">Jugador Y</option>
+              </select>
+              <span class="alert alert--danger show"
+                >Se debe seleccionar al titular</span
+              >
+
+              <!-- Importe de la transaccion -->
+              <label for="transactionAmount" class="form__label text-center"
+                >Valor de la transacción</label
+              >
+              <input
+                type="text"
+                name="transactionAmount"
+                id="transactionAmount"
+                class="form__input text-right error"
+                placeholder="$0"
+              />
+              <span class="alert alert--danger show"
+                >Ingresa un valor valido</span
+              >
+
+              <span class="alert alert--big alert--danger show"
+                >Fondos Insuficientes</span
+              >
+              <button class="btn btn--success">Realizar transaccion</button>
             </div>
           </div>
         </div>
-      </div>
-      <!-- Fin de dashboard -->
 
-      <!-- Tansferencia de efectivo -->
-      <div class="transfer">
-        <div class="container">
-          <header class="container__header">
-            <h1 class="container__title">Transferencia de Dinero</h1>
-          </header>
-          <div class="container__content">
-            <!-- Remitente -->
-            <label for="transferSender" class="form__label">Remitente</label>
-            <select name="transferSender" id="transferSender" class="form__input">
-              <option value="" selected disabled>Selecciona un remitente</option>
-              <option value="1" >Jugador x</option>
-            </select>
-            <span class="alert alert--danger show">Se debe seleccionar un remitente</span>
-
-            <!-- Destinatario -->
-            <label for="transferAddressed" class="form__label" title="sdsdsd">Destinatario</label>
-            <select name="transferAddressed" id="transferAddressed" class="form__input">
-              <option value="" disabled selected>Selecciona un destinatario</option>
-              <option value="2">Jugador y</option>
-            </select>
-            <span class="alert alert--danger show">Se debe seleccionar un destinatario</span>
-
-            <!-- Monto a transferir -->
-            <label for="transferAmount" class="form__label text-center">Monto a transferir</label>
-            <input type="text" name="transferAmount" id="transferAmount" class="form__input text-right" placeholder="$0">
-            <span class="alert alert--danger show">Ingresa un valor valido</span>
-
-            <span class="alert alert--big alert--success show">Monto transferido</span>
-
-            <button class="btn btn--success">Hacer Transferencia</button>
-          </div>
-        </div>
-        <!-- Fin del container -->
-      </div>
-
-      <!-- Transacciones -->
-      <div class="transactions">
-        <div class="container">
-          <div class="container__header">
-            <h1 class="container__title">Transacciones</h1>
-          </div>
-          <div class="container__content">
-            <!-- Seleccion del tipo de transaccion -->
-            <label class="form__label">Tipo de transacción</label>
-            <div class="form__group m-b">
-              <!-- Deposito -->
-              <div class="radio-group">
-                <input type="radio" name="transacctionType" id="deposit" class="form__radio">
-                <label for="deposit">Deposito</label>
-              </div>
-              <!-- Retiro -->
-              <div class="radio-group">
-                <input type="radio" name="transacctionType" id="whitdrawal" class="form__radio">
-                <label for="whitdrawal">Retiro</label>
-              </div>
+        <!-- Compra y venta de activos -->
+        <div class="sale-and-buy">
+          <div class="container">
+            <div class="container__header">
+              <h1 class="container__title">Ventas y Compras</h1>
+              <p class="container__subtitle">Se va a realizar una venta</p>
             </div>
-
-            <!-- Seleccion del titular -->
-            <label for="transactionAcount" class="form__label">Titular de la cuenta</label>
-            <select name="transactionAcount" id="transactionAcount" class="form__input">
-              <option value="" selected disabled>Selecciona un jugador</option>
-              <option value="1">Jugador X</option>
-              <option value="2">Jugador Y</option>
-            </select>
-            <span class="alert alert--danger show">Se debe seleccionar al titular</span>
-
-            <!-- Importe de la transaccion -->
-            <label for="transactionAmount" class="form__label text-center">Valor de la transacción</label>
-            <input type="text" name="transactionAmount" id="transactionAmount" class="form__input text-right error" placeholder="$0">
-            <span class="alert alert--danger show">Ingresa un valor valido</span>
-
-            <span class="alert alert--big alert--danger show">Fondos Insuficientes</span>
-            <button class="btn btn--success">Realizar transaccion</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Compra y venta de activos -->
-      <div class="sale-and-buy">
-        <div class="container">
-          <div class="container__header">
-            <h1 class="container__title">Ventas y Compras</h1>
-            <p class="container__subtitle">Se va a realizar una venta</p>
-          </div>
-          <div class="container__content">
-            <!-- Definir el tipo de operacion -->
-            <label class="form__label">Tipo de operacion</label>
-            <div class="form__group m-b-1">
-              <div class="radio-group">
-                <input type="radio" name="operationType" id="sale" class="radio__form">
-                <label for="sale">Venta</label>
+            <div class="container__content">
+              <!-- Definir el tipo de operacion -->
+              <label class="form__label">Tipo de operacion</label>
+              <div class="form__group m-b-1">
+                <div class="radio-group">
+                  <input
+                    type="radio"
+                    name="operationType"
+                    id="sale"
+                    class="radio__form"
+                  />
+                  <label for="sale">Venta</label>
+                </div>
+                <div class="radio-group">
+                  <input
+                    type="radio"
+                    name="operationType"
+                    id="buy"
+                    class="radio__form"
+                  />
+                  <label for="buy">Compra</label>
+                </div>
               </div>
-              <div class="radio-group">
-                <input type="radio" name="operationType" id="buy" class="radio__form">
-                <label for="buy">Compra</label>
+
+              <!-- Seleccion del titular -->
+              <label for="acountOfTransaction" class="form__label"
+                >Comprador / Vendedor</label
+              >
+              <select
+                name="acountOfTransaction"
+                id="acountOfTransaction"
+                class="form__input"
+              >
+                <option value="" selected disabled
+                  >Selecciona al comprador / Vendedor</option
+                >
+              </select>
+              <span class="alert alert--danger show"
+                >Se debe seleccionar a un titular</span
+              >
+
+              <!-- Seleccion del tipo de activo -->
+              <label class="form__label"
+                >Selecciona el activo a vender / Comprar</label
+              >
+              <div class="form__group form__group--evenly">
+                <div class="radio-group">
+                  <input
+                    type="radio"
+                    name="assetType"
+                    id="assetTitle"
+                    class="form__radio"
+                  />
+                  <label for="assetTitle">Titulo</label>
+                </div>
+                <div class="radio-group m-b">
+                  <input
+                    type="radio"
+                    name="assetType"
+                    id="assetLine"
+                    class="form__radio"
+                  />
+                  <label for="assetLine">Linea</label>
+                </div>
+                <div class="radio-group">
+                  <input
+                    type="radio"
+                    name="assetType"
+                    id="assetCustomPost"
+                    class="form__radio"
+                  />
+                  <label for="assetCustomPost">Paso</label>
+                </div>
+                <div class="radio-group">
+                  <input
+                    type="radio"
+                    name="assetType"
+                    id="assetHouse"
+                    class="form__radio"
+                  />
+                  <label for="assetHouse">Casa</label>
+                </div>
+                <div class="radio-group">
+                  <input
+                    type="radio"
+                    name="assetType"
+                    id="assetCastle"
+                    class="form__radio"
+                  />
+                  <label for="assetCastle">Castillo</label>
+                </div>
               </div>
+
+              <!-- Valor del activo a transaccionar -->
+              <label for="assetAmount" class="form__label text-center"
+                >Valor del activo</label
+              >
+              <input
+                type="text"
+                name="assetAmount"
+                id="assetAmount"
+                placeholder="$0"
+                class="form__input text-right"
+              />
+              <span class="alert alert--danger show"
+                >Ingresa un valor valido</span
+              >
+
+              <span class="alert alert--big alert--success show"
+                >Operacion Exitosa</span
+              >
+
+              <button class="btn btn--success">Hacer Venta / Compra</button>
             </div>
+          </div>
+        </div>
 
-            <!-- Seleccion del titular -->
-            <label for="acountOfTransaction" class="form__label">Comprador / Vendedor</label>
-            <select name="acountOfTransaction" id="acountOfTransaction" class="form__input">
-              <option value="" selected disabled>Selecciona al comprador / Vendedor</option>
-            </select>
-            <span class="alert alert--danger show">Se debe seleccionar a un titular</span>
-
-            <!-- Seleccion del tipo de activo -->
-            <label class="form__label">Selecciona el activo a vender / Comprar</label>
-            <div class="form__group form__group--evenly">
-              <div class="radio-group">
-                <input type="radio" name="assetType" id="assetTitle" class="form__radio">
-                <label for="assetTitle">Titulo</label>
-              </div>
-              <div class="radio-group m-b">
-                <input type="radio" name="assetType" id="assetLine" class="form__radio">
-                <label for="assetLine">Linea</label>
-              </div>
-              <div class="radio-group">
-                <input type="radio" name="assetType" id="assetCustomPost" class="form__radio">
-                <label for="assetCustomPost">Paso</label>
-              </div>
-              <div class="radio-group">
-                <input type="radio" name="assetType" id="assetHouse" class="form__radio">
-                <label for="assetHouse">Casa</label>
-              </div>
-              <div class="radio-group">
-                <input type="radio" name="assetType" id="assetCastle" class="form__radio">
-                <label for="assetCastle">Castillo</label>
-              </div>
+        <!-- Entrega de premios -->
+        <div class="awards">
+          <div class="container">
+            <div class="container__header">
+              <h1 class="container__title">Entrega de premios</h1>
             </div>
+            <div class="container__content">
+              <!-- Seleccion del jugador -->
+              <label for="acountAward" class="form__label">Jugador</label>
+              <select name="acountAward" id="acountAward" class="form__input">
+                <option value="" selected disabled
+                  >Selecciona a un jugador</option
+                >
+              </select>
+              <span class="alert alert--danger show"
+                >Se debe seleccionar un jugador</span
+              >
 
-            <!-- Valor del activo a transaccionar -->
-            <label for="assetAmount" class="form__label text-center">Valor del activo</label>
-            <input type="text" name="assetAmount" id="assetAmount" placeholder="$0" class="form__input text-right">
-            <span class="alert alert--danger show">Ingresa un valor valido</span>
-
-            <span class="alert alert--big alert--success show">Operacion Exitosa</span>
-
-            <button class="btn btn--success">Hacer Venta / Compra</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Entrega de premios -->
-      <div class="awards">
-        <div class="container">
-          <div class="container__header">
-            <h1 class="container__title">Entrega de premios</h1>
-          </div>
-          <div class="container__content">
-            <!-- Seleccion del jugador -->
-            <label for="acountAward" class="form__label">Jugador</label>
-            <select name="acountAward" id="acountAward" class="form__input">
-              <option value="" selected disabled>Selecciona a un jugador</option>
-            </select>
-            <span class="alert alert--danger show">Se debe seleccionar un jugador</span>
-
-            <!-- Seleccion del premio -->
-            <label class="form__label">Selecciona el premio</label>
-            <div class="form__group form__group--evenly m-b-1">
-              <div class="radio-group m-b">
-                <input type="radio" name="awardType" id="bambiAward" class="form__radio">
-                <label for="bambiAward">Bambi</label>
+              <!-- Seleccion del premio -->
+              <label class="form__label">Selecciona el premio</label>
+              <div class="form__group form__group--evenly m-b-1">
+                <div class="radio-group m-b">
+                  <input
+                    type="radio"
+                    name="awardType"
+                    id="bambiAward"
+                    class="form__radio"
+                  />
+                  <label for="bambiAward">Bambi</label>
+                </div>
+                <div class="radio-group">
+                  <input
+                    type="radio"
+                    name="awardType"
+                    id="daisyAward"
+                    class="form__radio"
+                  />
+                  <label for="daisyAward">Daisy</label>
+                </div>
+                <div class="radio-group">
+                  <input
+                    type="radio"
+                    name="awardType"
+                    id="pinocchioAward"
+                    class="form__radio"
+                  />
+                  <label for="pinocchioAward">Pinocho</label>
+                </div>
+                <div class="radio-group">
+                  <input
+                    type="radio"
+                    name="awardType"
+                    id="cinderellaAward"
+                    class="form__radio"
+                  />
+                  <label for="cinderellaAward">Cenicienta</label>
+                </div>
               </div>
-              <div class="radio-group">
-                <input type="radio" name="awardType" id="daisyAward" class="form__radio">
-                <label for="daisyAward">Daisy</label>
-              </div>
-              <div class="radio-group">
-                <input type="radio" name="awardType" id="pinocchioAward" class="form__radio">
-                <label for="pinocchioAward">Pinocho</label>
-              </div>
-              <div class="radio-group">
-                <input type="radio" name="awardType" id="cinderellaAward" class="form__radio">
-                <label for="cinderellaAward">Cenicienta</label>
-              </div>
+
+              <span class="alert alert--big alert--success show"
+                >Premio entregado</span
+              >
+              <button class="btn btn--success">Entregar premio</button>
             </div>
-
-            <span class="alert alert--big alert--success show">Premio entregado</span>
-            <button class="btn btn--success">Entregar premio</button>
           </div>
         </div>
-      </div>
 
-      <!-- Cobro de impuestos -->
-      <div class="taxes">
-        <div class="container">
-          <div class="container__header">
-            <h1 class="container__title">Impuestos</h1>
-          </div>
-          <div class="container__content">
-            <!-- Seleccion del departamento de impuesto -->
-            <label for="taxType" class="form__label">Departamento de impuesto</label>
-            <select name="taxType" id="taxType" class="form__input">
-              <option value="" selected disabled>Selecciona al departamento</option>
-              <option value="1">Banco</option>
-              <option value="1">Tierra de la Fantasía</option>
-              <option value="1">Tierra de la Aventura</option>
-              <option value="1">Tierra de la frontera</option>
-            </select>
+        <!-- Cobro de impuestos -->
+        <div class="taxes">
+          <div class="container">
+            <div class="container__header">
+              <h1 class="container__title">Impuestos</h1>
+            </div>
+            <div class="container__content">
+              <!-- Seleccion del departamento de impuesto -->
+              <label for="taxType" class="form__label"
+                >Departamento de impuesto</label
+              >
+              <select name="taxType" id="taxType" class="form__input">
+                <option value="" selected disabled
+                  >Selecciona al departamento</option
+                >
+                <option value="1">Banco</option>
+                <option value="1">Tierra de la Fantasía</option>
+                <option value="1">Tierra de la Aventura</option>
+                <option value="1">Tierra de la frontera</option>
+              </select>
 
-            <!-- Ingresa el valor del impuesto -->
-            <label for="taxAmount" class="form__label text-center">Valor a cobrar</label>
-            <input type="text" name="taxAmount" id="taxAmount" class="form__input text-right" placeholder="$0">
-            <span class="alert alert--danger show">Ingresa un valor valido</span>
+              <!-- Ingresa el valor del impuesto -->
+              <label for="taxAmount" class="form__label text-center"
+                >Valor a cobrar</label
+              >
+              <input
+                type="text"
+                name="taxAmount"
+                id="taxAmount"
+                class="form__input text-right"
+                placeholder="$0"
+              />
+              <span class="alert alert--danger show"
+                >Ingresa un valor valido</span
+              >
 
-            <span class="alert alert--big alert--danger show">Saldo Insuficiente</span>
-            <button class="btn btn--success">Cobrar Impuesto</button>
+              <span class="alert alert--big alert--danger show"
+                >Saldo Insuficiente</span
+              >
+              <button class="btn btn--success">Cobrar Impuesto</button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="loot">
-        <div class="container">
-          <div class="container__header">
-            <h1 class="container__title">Cobrar Botín</h1>
-          </div>
-          <div class="container__content">
-            <!-- Seleccion del departamento de impuesto -->
-            <label for="lootType" class="form__label">Departamento a saquear</label>
-            <select name="lootType" id="lootType" class="form__input">
-              <option value="" selected disabled>Selecciona al departamento</option>
-              <option value="1">Banco</option>
-              <option value="1">Tierra de la Fantasía</option>
-              <option value="1">Tierra de la Aventura</option>
-              <option value="1">Tierra de la frontera</option>
-            </select>
+        <div class="loot">
+          <div class="container">
+            <div class="container__header">
+              <h1 class="container__title">Cobrar Botín</h1>
+            </div>
+            <div class="container__content">
+              <!-- Seleccion del departamento de impuesto -->
+              <label for="lootType" class="form__label"
+                >Departamento a saquear</label
+              >
+              <select name="lootType" id="lootType" class="form__input">
+                <option value="" selected disabled
+                  >Selecciona al departamento</option
+                >
+                <option value="1">Banco</option>
+                <option value="1">Tierra de la Fantasía</option>
+                <option value="1">Tierra de la Aventura</option>
+                <option value="1">Tierra de la frontera</option>
+              </select>
 
-            <!-- Ingresa el valor del impuesto -->
-            <label for="lootAmount" class="form__label text-center">Valor a saquear</label>
-            <input type="text" name="lootAmount" id="lootAmount" class="form__input text-right" placeholder="$0">
-            <span class="alert alert--danger show">Ingresa un valor valido</span>
+              <!-- Ingresa el valor del impuesto -->
+              <label for="lootAmount" class="form__label text-center"
+                >Valor a saquear</label
+              >
+              <input
+                type="text"
+                name="lootAmount"
+                id="lootAmount"
+                class="form__input text-right"
+                placeholder="$0"
+              />
+              <span class="alert alert--danger show"
+                >Ingresa un valor valido</span
+              >
 
-            <span class="alert alert--big alert--success show">Saqueo Exitoso</span>
-            <button class="btn btn--success">Saquear</button>
+              <span class="alert alert--big alert--success show"
+                >Saqueo Exitoso</span
+              >
+              <button class="btn btn--success">Saquear</button>
+            </div>
           </div>
         </div>
       </div>
