@@ -35,14 +35,16 @@
 }
 
 body {
-  font-size: 16px;
-  font-family: var(--body-font);
   min-height: 100vh;
+  margin-top: var(--headerHeight);
+  padding-top: 1em;
   background-image: url(../img/loby_bg_min.jpg);
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
+  font-family: var(--body-font);
+  font-size: 16px;
 }
 
 .text-bold{
