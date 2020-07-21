@@ -4,7 +4,7 @@
   --z-tooltip: 10;
   --z-fixed: 100;
   --z-modal: 1000;
-  --headerHeight: 3.125em;
+  --headerHeight: 3.125rem;
   --body-font: "Poppins", sans-serif;
   --title-font: "Playfair Display", serif;
   --ceramic: #cdcdc0;
@@ -313,6 +313,7 @@ body {
 
 .loby-card__form {
   display: flex;
+  justify-content: space-between;
 }
 
 .loby-card__fig {
@@ -659,4 +660,20 @@ body {
   font-size: .8em;
   line-height: 1;
   outline: none;
+}
+
+@media (min-width:375px){
+  body{
+    font-size: 18px;
+  }
+
+  .tab-button{
+    font-size: 0.9em;
+  }
+}
+
+@media (min-width: 768px){
+  body{
+    font-size: 22px;
+  }
 }
