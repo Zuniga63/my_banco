@@ -191,6 +191,11 @@ body {
   border-radius: 5px;
   color:var(--light);
   letter-spacing: 2px;
+  flex-wrap: wrap;
+}
+
+.form__group--evenly{
+  justify-content: space-evenly;
 }
 
 .form__radio{

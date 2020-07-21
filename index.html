@@ -427,6 +427,71 @@
         </div>
       </div>
 
+      <!-- Compra y venta de activos -->
+      <div class="sale-and-buy">
+        <div class="container">
+          <div class="container__header">
+            <h1 class="container__title">Ventas y Compras</h1>
+            <p class="container__subtitle">Se va a realizar una venta</p>
+          </div>
+          <div class="container__content">
+            <!-- Definir el tipo de operacion -->
+            <label class="form__label">Tipo de operacion</label>
+            <div class="form__group m-b-1">
+              <div class="radio-group">
+                <input type="radio" name="operationType" id="sale" class="radio__form">
+                <label for="sale">Venta</label>
+              </div>
+              <div class="radio-group">
+                <input type="radio" name="operationType" id="buy" class="radio__form">
+                <label for="buy">Compra</label>
+              </div>
+            </div>
+
+            <!-- Seleccion del titular -->
+            <label for="acountOfTransaction" class="form__label">Comprador / Vendedor</label>
+            <select name="acountOfTransaction" id="acountOfTransaction" class="form__input">
+              <option value="" selected disabled>Selecciona al comprador / Vendedor</option>
+            </select>
+            <span class="alert alert--danger show">Se debe seleccionar a un titular</span>
+
+            <!-- Seleccion del tipo de activo -->
+            <label class="form__label">Selecciona el activo a vender / Comprar</label>
+            <div class="form__group form__group--evenly">
+              <div class="radio-group">
+                <input type="radio" name="assetType" id="assetTitle" class="form__radio">
+                <label for="assetTitle">Titulo</label>
+              </div>
+              <div class="radio-group m-b">
+                <input type="radio" name="assetType" id="assetLine" class="form__radio">
+                <label for="assetLine">Linea</label>
+              </div>
+              <div class="radio-group">
+                <input type="radio" name="assetType" id="assetCustomPost" class="form__radio">
+                <label for="assetCustomPost">Paso</label>
+              </div>
+              <div class="radio-group">
+                <input type="radio" name="assetType" id="assetHouse" class="form__radio">
+                <label for="assetHouse">Casa</label>
+              </div>
+              <div class="radio-group">
+                <input type="radio" name="assetType" id="assetCastle" class="form__radio">
+                <label for="assetCastle">Castillo</label>
+              </div>
+            </div>
+
+            <!-- Valor del activo a transaccionar -->
+            <label for="assetAmount" class="form__label text-center">Valor del activo</label>
+            <input type="text" name="assetAmount" id="assetAmount" placeholder="$0" class="form__input text-right">
+            <span class="alert alert--danger show">Ingresa un valor valido</span>
+
+            <span class="alert alert--big alert--success show">Operacion Exitosa</span>
+
+            <button class="btn btn--success">Hacer Venta / Compra</button>
+          </div>
+        </div>
+      </div>
+
       <!-- Icons made by <a href="https://creativemarket.com/eucalyp" title="Eucalyp">Eucalyp</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a> -->
     </div>
 
