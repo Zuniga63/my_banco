@@ -190,7 +190,8 @@
             </div>
             <footer class="container__actions">
               <button
-                class="btn btn--success"
+                :class="['btn', {'btn--success' : bank.money >= 26400, 'btn--disable': bank.money < 26400}]"
+                :disabled="bank.money < 26400"
                 @click="modals.newPlayer.visible=true"
               >
                 Nuevo Jugador

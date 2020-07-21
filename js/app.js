@@ -261,5 +261,15 @@ const vm = new Vue({
     this.loby.bankerName = "Andrés Felipe";
     this.loby.password = "0000";
     this.startNewGame();
+    //Para estar cerca al maximo numero de jugadores
+    this.bank.newPlayer('Julian', '0000');
+    this.bank.newPlayer('Juliana', '0000');
+    this.bank.newPlayer('Fransika', '0000');
+    this.bank.newPlayer('Magnus', '0000');
+    this.bank.newPlayer('Mikkel', '0000');
+    this.bank.newPlayer('Jhonas', '0000');
+    this.bank.newPlayer('Martha', '0000');
+    this.bank.newPlayer('Adan', '0000');
+    this.bank.newPlayer('Eva', '0000');
   },//Fin de create
 })
