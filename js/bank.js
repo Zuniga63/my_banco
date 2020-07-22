@@ -421,8 +421,8 @@ class Bank extends Acount {
     let addressedExist = this.players.some(p => p.id === senderID);
 
     if (senderExist && addressedExist) {
-      let sender = this.players.filter(p => p.id === senderID);
-      let addressed = this.players.filter(p => p.id === addressedID);
+      let sender = this.players.filter(p => p.id === senderID)[0];
+      let addressed = this.players.filter(p => p.id === addressedID)[0];
 
       if (sender.password === senderPassword) {
         if (typeof amount === "number" && amount > 0) {
