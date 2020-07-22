@@ -34,6 +34,19 @@ class DashBoard {
   }
 }
 
+class Transfer {
+  constructor() {
+    this.visible = true;
+    this.senderID = '';
+    this.senderState = new State();
+    this.addressedID = '';
+    this.addresseState = new State();
+    this.transferAmount = '';
+    this.transferAmountState = new State();
+    this.processState = new State();
+  }
+}
+
 class NewPlayerModal {
   constructor() {
     this.visible = false;
@@ -54,22 +67,63 @@ class NewPlayerModal {
   }
 }
 
-class PaySalaryModal{
-  constructor(){
+class PaySalaryModal {
+  constructor() {
     this.visible = false;
     this.player = null;
   }
 
-  show(player){
+  show(player) {
     this.visible = true;
     this.player = player;
   }
 
-  hidden(){
+  hidden() {
     this.visible = false;
     this.player = null;
   }
 }
+
+Vue.component('input-money', {
+  props: ['value'],
+  template: `
+  <input
+    type="text"
+    class="form__input text-right"
+    :value="value"
+    @input="$emit('input', formatCurrencyInput($event.target.value))"
+    placeholder="$0"
+    style="letter-spacing: 5px;"
+  />`,
+  methods: {
+    formatCurrencyInput(value) {
+      value = this.deleteCurrencyFormater(value);
+      value = parseFloat(value);
+      if(!isNaN(value)){
+        value = this.formatCurrency(value);
+      }else{
+        value = '';
+      }
+
+      return value;
+    },
+    deleteCurrencyFormater(text) {
+      let value = text.replace('$', '');
+      value = value.split(".");
+      value = value.join('');
+
+      return value;
+    },
+    formatCurrency(value) {
+      var formatted = new Intl.NumberFormat('es-Co', {
+        style: 'currency',
+        currency: 'COP',
+        minimumFractionDigits: 0
+      }).format(value);
+      return formatted;
+    },//Fin del metodo, 
+  }
+})
 
 const vm = new Vue({
   el: '#app',
@@ -78,6 +132,7 @@ const vm = new Vue({
     version: '1.0',
     bank: new Bank(),
     loby: new Loby(),
+    transfer: new Transfer(),
     dashBoard: new DashBoard(),
     modals: {
       newPlayer: new NewPlayerModal(),
@@ -218,12 +273,12 @@ const vm = new Vue({
         modal.hidden();
       }//Fin de if
     },
-    paySalary(){
+    paySalary() {
       //Para empesar recupero los datos del jugador
       let player = this.modals.paySalary.player;
-      if(player && player.id){
+      if (player && player.id) {
         let process = this.bank.paySalary(player.id);
-        if(process.result){
+        if (process.result) {
           this.modals.paySalary.hidden();
         }
       }
