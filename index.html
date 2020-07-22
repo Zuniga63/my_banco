@@ -333,7 +333,7 @@
         <!-- Fin de dashboard -->
 
         <!-- Tansferencia de efectivo -->
-        <div class="transfer">
+        <div class="transfer" v-show="transfer.visible">
           <div class="container">
             <header class="container__header">
               <h1 class="container__title">Transferencia de Dinero</h1>
@@ -417,7 +417,7 @@
         </div>
 
         <!-- Transacciones -->
-        <div class="transactions">
+        <div class="transactions" v-show="transaction.visible">
           <div class="container">
             <div class="container__header">
               <h1 class="container__title">Transacciones</h1>
@@ -433,6 +433,8 @@
                     name="transacctionType"
                     id="deposit"
                     class="form__radio"
+                    value="deposit"
+                    v-model="transaction.type"
                   />
                   <label for="deposit">Deposito</label>
                 </div>
@@ -443,6 +445,8 @@
                     name="transacctionType"
                     id="whitdrawal"
                     class="form__radio"
+                    value="whitdrawal"
+                    v-model="transaction.type"
                   />
                   <label for="whitdrawal">Retiro</label>
                 </div>
@@ -456,36 +460,61 @@
                 name="transactionAcount"
                 id="transactionAcount"
                 class="form__input"
+                v-model="transaction.acountID"
+                @blur="validateTransactionAcount"
               >
                 <option value="" selected disabled
                   >Selecciona un jugador</option
                 >
-                <option value="1">Jugador X</option>
-                <option value="2">Jugador Y</option>
+                <option v-for="player in bank.players" :value="player.id"
+                  >{{player.name}}</option
+                >
               </select>
-              <span class="alert alert--danger show"
-                >Se debe seleccionar al titular</span
+              <span
+                :class="['alert', 'alert--danger', {show: transaction.acountState.hasError}]"
+              >
+                >{{transaction.acountState.message}}</span
               >
 
               <!-- Importe de la transaccion -->
-              <label for="transactionAmount" class="form__label text-center"
+              <label
+                for="transactionAmount"
+                class="form__label text-center text-bold"
                 >Valor de la transacción</label
               >
-              <input
-                type="text"
-                name="transactionAmount"
+
+              <input-money
                 id="transactionAmount"
-                class="form__input text-right error"
-                placeholder="$0"
-              />
-              <span class="alert alert--danger show"
-                >Ingresa un valor valido</span
+                v-model="transaction.amount"
+                @blur="validateTransactionAmount"
+              ></input-money>
+              <span
+                :class="['alert', 'alert--danger', {show:transaction.amountState.hasError}]"
+                style="margin-top: -1em;"
+                >{{transaction.amountState.message}}</span
               >
 
-              <span class="alert alert--big alert--danger show"
-                >Fondos Insuficientes</span
+              <template v-if="transaction.type === 'whitdrawal'">
+                <label for="transactionPassword" class="form__label"
+                  >Contraseña</label
+                >
+                <input
+                  type="password"
+                  name="transctionPassword"
+                  id="transactionPassword"
+                  class="form__input"
+                  placeholder="Ingresa la contraseña"
+                  style="margin-bottom: 1em;"
+                  v-model="transaction.password"
+                />
+              </template>
+
+              <span
+                :class="['alert', 'alert--big', {'alert--danger': transaction.process.hasError, 'alert--success': !transaction.process.hasError, show: transaction.showAlert}]"
+                >{{transaction.process.message}}</span
               >
-              <button class="btn btn--success">Realizar transaccion</button>
+
+              <button class="btn btn--success" @click="makeTransaction">Realizar transaccion</button>
             </div>
           </div>
         </div>
@@ -847,7 +876,10 @@
           </div>
         </div>
 
-        <div :class="['modal', {show: modals.transfer.visible}]" @click.self="modals.transfer.hidden()">
+        <div
+          :class="['modal', {show: modals.transfer.visible}]"
+          @click.self="modals.transfer.hidden()"
+        >
           <div class="modal__content">
             <div class="modal__close" @click="modals.transfer.hidden()">
               <i class="fas fa-times-circle"></i>
@@ -864,7 +896,7 @@
                   >{{formatCurrency(modals.transfer.amount)}}</span
                 >
               </p>
-  
+
               <input
                 type="password"
                 name="password"
@@ -876,9 +908,16 @@
 
             <span
               :class="['alert', 'alert--big', {'alert--success' : !modals.transfer.processState.hasError, 'alert--danger': modals.transfer.processState.hasError, show: modals.transfer.showAlert}]"
-              >{{modals.transfer.processState.hasError ? modals.transfer.processState.message :  'Transferencia realizada'}}</span
+              >{{modals.transfer.processState.hasError ?
+              modals.transfer.processState.message : 'Transferencia realizada'}}
+            </span>
+            <button
+              class="btn btn--success"
+              @click="makeTransfer"
+              :disabled="modals.transfer.senderPassword.length <= 3"
             >
-            <button class="btn btn--success" @click="makeTransfer" :disabled="modals.transfer.senderPassword.length <= 3">Hacer Transferencia</button>
+              Hacer Transferencia
+            </button>
           </div>
         </div>
 

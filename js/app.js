@@ -11,6 +11,11 @@ class State {
     this.hasError = false;
     this.message = "";
   }
+
+  reset() {
+    this.hasError = false;
+    this.message = "";
+  }
 }
 
 /**
@@ -46,7 +51,7 @@ class Transfer {
     this.processState = new State();
   }
 
-  reset(){
+  reset() {
     this.visible = true;
     this.senderID = '';
     this.senderState.hasError = false;
@@ -55,6 +60,29 @@ class Transfer {
     this.transferAmount = '';
     this.transferAmountState.hasError = false;
     // this.processState = new State();
+  }
+}
+
+class PlayerTransaction {
+  constructor() {
+    this.visible = true;
+    this.type = 'deposit';
+    this.acountID = '';
+    this.acountState = new State();
+    this.amount = '';
+    this.amountState = new State();
+    this.process = new State();
+    this.showAlert = false;
+    this.password = '';
+  }
+
+  reset() {
+    this.type = 'deposit';
+    this.acountID = '';
+    this.acountState.reset();
+    this.amount = '';
+    this.amountState.reset();
+    this.password=''
   }
 }
 
@@ -193,6 +221,7 @@ const vm = new Vue({
     loby: new Loby(),
     dashBoard: new DashBoard(),
     transfer: new Transfer(),
+    transaction: new PlayerTransaction(),
     modals: {
       newPlayer: new NewPlayerModal(),
       paySalary: new PaySalaryModal(),
@@ -423,7 +452,7 @@ const vm = new Vue({
         this.modals.transfer.show(senderID, senderName, addressedID, addressedName, amount);
       }
     },
-    makeTransfer(){
+    makeTransfer() {
       let modal = this.modals.transfer;
       let senderID = modal.senderID;
       let addressedID = modal.addressedID;
@@ -432,19 +461,129 @@ const vm = new Vue({
 
       let process = this.bank.moneyTransfer(senderID, password, amount, addressedID);
 
-      if(process.result){
+      if (process.result) {
         modal.showAlert = true;
         modal.processState.hasError = false;
 
         //Ahora reinicio los campos
         this.transfer.reset();
-      }else{
+      } else {
         modal.showAlert = true;
         modal.processState.hasError = true;
         modal.processState.message = process.message;
       }
-    }
+    },
+    //------------------------------------------------------------
+    //METODOS PARA VALIDAR LAS TRANSACCIONES
+    validateTransactionType() {
+      let result = false;
+      let type = this.transaction.type;
+      if (type === 'deposit' || type === 'whitdrawal') {
+        result = true;
+      }
+      return result;
+    },
+    validateTransactionAcount() {
+      let result = this.bank.players.some(p => p.id === this.transaction.acountID);
+      let state = this.transaction.acountState;
+      if (!result) {
+        state.hasError = true;
+        state.message = "Se debe seleccionar un titular";
+      } else {
+        state.reset();
+      }
 
+      return result;
+    },
+    validateTransactionAmount() {
+      let result = false;
+      let amount = this.transaction.amount;
+      let state = this.transaction.amountState;
+
+      //Ahora retiro el formateado demoneda y convierto en numero
+      amount = amount.replace('$', '');
+      amount = amount.split(".");
+      amount = amount.join('');
+      amount = parseFloat(amount);
+
+      if (!isNaN(amount) && amount > 0) {
+        state.reset();
+        result = true;
+      } else {
+        state.hasError = true;
+        state.message = 'Ingresa un valor valido';
+      }
+
+      return result;
+    },
+    makeTransaction() {
+      let typeVal = this.validateTransactionType();
+      let acountVal = this.validateTransactionAcount();
+      let amountVal = this.validateTransactionAmount();
+
+      if (typeVal && acountVal && amountVal) {
+        let type = this.transaction.type;
+        let acountID = this.transaction.acountID;
+        let password = this.transaction.password;
+        let amount = this.transaction.amount;
+
+
+        amount = amount.replace('$', '');
+        amount = amount.split(".");
+        amount = amount.join('');
+        amount = parseFloat(amount);
+
+        switch (type) {
+          case 'deposit': {
+            let process = this.bank.cashDeposit(acountID, amount);
+            if (process.result) {
+              this.transaction.reset();
+
+              //Ahora se muestra la alerta
+              this.transaction.showAlert = true;
+              this.transaction.process.hasError = false;
+              this.transaction.process.message = "Se realizó el deposito"
+            } else {
+              //Ahora se muestra la alerta
+              this.transaction.showAlert = true;
+              this.transaction.process.hasError = true;
+              this.transaction.process.message = process.message;
+            }
+
+            setTimeout(() => {
+              this.transaction.showAlert = false;
+              this.transaction.process.reset();
+            }, 5000);
+
+          } break;
+          case 'whitdrawal': {
+            let process = this.bank.cashWhitdrawal(acountID, password, amount);
+
+            if (process.result) {
+              this.transaction.reset();
+
+              //Ahora se muestra la alerta
+              this.transaction.showAlert = true;
+              this.transaction.process.hasError = false;
+              this.transaction.process.message = "Transacción Exitosa!"
+            } else {
+              //Ahora se muestra la alerta
+              this.transaction.showAlert = true;
+              this.transaction.process.hasError = true;
+              this.transaction.process.message = process.message;
+            }
+
+            setTimeout(() => {
+              this.transaction.showAlert = false;
+              this.transaction.process.reset();
+            }, 5000);
+          } break;
+        }
+
+      }
+
+    }
+    //------------------------------------------------------------
   },//Fin de methods
   computed: {
     /**
