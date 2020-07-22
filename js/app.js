@@ -45,6 +45,17 @@ class Transfer {
     this.transferAmountState = new State();
     this.processState = new State();
   }
+
+  reset(){
+    this.visible = true;
+    this.senderID = '';
+    this.senderState.hasError = false;
+    this.addressedID = '';
+    this.addresseState.hasError = false;
+    this.transferAmount = '';
+    this.transferAmountState.hasError = false;
+    // this.processState = new State();
+  }
 }
 
 class NewPlayerModal {
@@ -67,6 +78,10 @@ class NewPlayerModal {
   }
 }
 
+/**
+ * Entidad que cotrola los datos del modal para
+ * pagar salario
+ */
 class PaySalaryModal {
   constructor() {
     this.visible = false;
@@ -84,6 +99,49 @@ class PaySalaryModal {
   }
 }
 
+class TransferModal {
+  constructor() {
+    this.visible = false;
+    this.senderID = '';
+    this.senderName = '';
+    this.addressedID = '';
+    this.addressedName = '';
+    this.senderPassword = '';
+    this.amount = '';
+    this.showAlert = false;
+    this.processState = new State();
+  }
+
+  /**
+   * Cambia el estado del modal y carga los datos de la transaccion
+   * @param {number} senderId Identificador del remitente
+   * @param {string} senderName Nombre del remitente
+   * @param {number} addressedID Identificador del destinatario
+   * @param {string} addressedName Nombre del destinatario
+   * @param {number} amount Importe a transferrir
+   */
+  show(senderId, senderName, addressedID, addressedName, amount) {
+    this.visible = true;
+    this.senderID = senderId;
+    this.senderName = senderName;
+    this.addressedID = addressedID;
+    this.addressedName = addressedName;
+    this.amount = amount;
+  }
+
+  hidden() {
+    this.visible = false;
+    this.senderID = '';
+    this.senderName = '';
+    this.addressedID = '';
+    this.addressedName = '';
+    this.senderPassword = '';
+    this.amount = '';
+    this.showAlert = false;
+    this.processState.hasError = false;
+  }
+}
+
 Vue.component('input-money', {
   props: ['value'],
   template: `
@@ -92,16 +150,17 @@ Vue.component('input-money', {
     class="form__input text-right"
     :value="value"
     @input="$emit('input', formatCurrencyInput($event.target.value))"
+    @blur="$emit('blur')"
     placeholder="$0"
-    style="letter-spacing: 5px;"
+    style="letter-spacing: 5px; margin-bottom: 1em;"
   />`,
   methods: {
     formatCurrencyInput(value) {
       value = this.deleteCurrencyFormater(value);
       value = parseFloat(value);
-      if(!isNaN(value)){
+      if (!isNaN(value)) {
         value = this.formatCurrency(value);
-      }else{
+      } else {
         value = '';
       }
 
@@ -132,11 +191,12 @@ const vm = new Vue({
     version: '1.0',
     bank: new Bank(),
     loby: new Loby(),
-    transfer: new Transfer(),
     dashBoard: new DashBoard(),
+    transfer: new Transfer(),
     modals: {
       newPlayer: new NewPlayerModal(),
       paySalary: new PaySalaryModal(),
+      transfer: new TransferModal(),
     },
   },//Fin de data
   methods: {
@@ -283,6 +343,108 @@ const vm = new Vue({
         }
       }
     },//Fin del metodo
+    //------------------------------------------------------------
+    //METODOS PARA VALIDAR LAS TRANSFERENCIA DE DINERO
+    //------------------------------------------------------------
+    validateSenderID() {
+      let senderID = this.transfer.senderID;
+      let result = false;
+
+      senderID = parseFloat(senderID);
+
+      if (!isNaN(senderID)) {
+        this.transfer.senderState.hasError = false;
+        this.transfer.senderState.message = "";
+        result = true;
+      } else {
+        this.transfer.senderState.hasError = true;
+        this.transfer.senderState.message = "Se debe seleccionar un remitente";
+      }
+
+      return result;
+    },
+    validateAddressedID() {
+      let addressedID = this.transfer.addressedID;
+      let state = this.transfer.addresseState;
+      let result = false;
+
+      addressedID = parseFloat(addressedID);
+      if (!isNaN(addressedID)) {
+        state.hasError = false;
+        state.message = "";
+        result = true;
+      } else if (this.playersAdressed.length > 0) {
+        state.hasError = true;
+        state.message = "Se debe seleccionar un destinatario";
+      }
+
+      return result;
+    },
+    validateTransferAmount() {
+      let amount = this.transfer.transferAmount;
+      let state = this.transfer.transferAmountState;
+      let result = false;
+
+      //Elimino el formateado
+      amount = amount.replace('$', '');
+      amount = amount.split(".");
+      amount = amount.join('');
+      amount = parseFloat(amount);
+
+      if (!isNaN(amount) && amount > 0) {
+        state.hasError = false;
+        state.message = '';
+        result = true;
+      } else {
+        state.hasError = true;
+        state.message = 'Ingresa un valor valido';
+      }
+
+      return result;
+    },
+    validateTransfer() {
+      let senderVal = this.validateSenderID();
+      let addressedVal = this.validateAddressedID();
+      let amountValidation = this.validateTransferAmount();
+
+      if (senderVal && addressedVal && amountValidation) {
+        let senderID = this.transfer.senderID;
+        let addressedID = this.transfer.addressedID;
+        let amount = this.transfer.transferAmount;
+        //Elimino el formateado
+        amount = amount.replace('$', '');
+        amount = amount.split(".");
+        amount = amount.join('');
+        amount = parseFloat(amount);
+
+        let senderName = this.bank.players.filter(p => p.id === senderID)[0].name;
+        let addressedName = this.bank.players.filter(p => p.id === addressedID)[0].name;
+
+        this.modals.transfer.show(senderID, senderName, addressedID, addressedName, amount);
+      }
+    },
+    makeTransfer(){
+      let modal = this.modals.transfer;
+      let senderID = modal.senderID;
+      let addressedID = modal.addressedID;
+      let amount = modal.amount;
+      let password = modal.senderPassword;
+
+      let process = this.bank.moneyTransfer(senderID, password, amount, addressedID);
+
+      if(process.result){
+        modal.showAlert = true;
+        modal.processState.hasError = false;
+
+        //Ahora reinicio los campos
+        this.transfer.reset();
+      }else{
+        modal.showAlert = true;
+        modal.processState.hasError = true;
+        modal.processState.message = process.message;
+      }
+    }
+
   },//Fin de methods
   computed: {
     /**
@@ -336,7 +498,19 @@ const vm = new Vue({
       }//Fin de if
       return result;
     },
+    /**
+     * Retorna una lista de jugadores ordenadas alfabeticamnete si incluir 
+     * al jugador encargado de hacer la transferencia
+     */
+    playersAdressed() {
+      let senderID = parseFloat(this.transfer.senderID);
+      let players = [];
+      if (!isNaN(senderID)) {
+        players = this.bank.players.filter(p => p.id !== senderID);
+      }
 
+      return players.sort((a, b) => a.name.localeCompare(b.name));
+    },
   },//Fin de computed
   created() {
     this.loby.visibility = true;

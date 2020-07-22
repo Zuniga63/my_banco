@@ -250,7 +250,7 @@
                         Pagar Sueldo
                       </button>
                     </div>
-                    <button class="player-card__delete">X</button>
+                    <!-- <button class="player-card__delete">X</button> -->
                   </div>
                 </div>
                 <div class="tab__footer">
@@ -344,49 +344,73 @@
               <select
                 name="transferSender"
                 id="transferSender"
-                class="form__input"
+                :class="['form__input', {error: transfer.senderState.hasError}]"
+                v-model="transfer.senderID"
+                @blur="validateSenderID"
               >
                 <option value="" selected disabled
                   >Selecciona un remitente</option
                 >
-                <option v-for="player in bank.players" :value="player.id" :key="player.id">{{player.name}}</option>
+                <option
+                  v-for="player in bank.players"
+                  :value="player.id"
+                  :key="player.id"
+                  >{{player.name}}</option
+                >
               </select>
-              <span class="alert alert--danger show"
-                >Se debe seleccionar un remitente</span
+              <span
+                :class="['alert', 'alert--danger', {show: transfer.senderState.hasError}]"
+                >{{transfer.senderState.message}}</span
               >
 
               <!-- Destinatario -->
-              <label for="transferAddressed" class="form__label" title="sdsdsd"
+              <label for="transferAddressed" class="form__label"
                 >Destinatario</label
               >
               <select
                 name="transferAddressed"
                 id="transferAddressed"
-                class="form__input"
+                :class="['form__input', {error: transfer.addresseState.hasError}]"
+                v-model="transfer.addressedID"
+                @blur="validateAddressedID"
               >
                 <option value="" disabled selected
                   >Selecciona un destinatario</option
                 >
-                <option value="2">Jugador y</option>
+                <option
+                  v-for="player in playersAdressed"
+                  :value="player.id"
+                  :key="player.id"
+                  >{{player.name}}</option
+                >
               </select>
-              <span class="alert alert--danger show"
-                >Se debe seleccionar un destinatario</span
+              <span
+                :class="['alert', 'alert--danger', {show: transfer.addresseState.hasError}]"
+                >{{transfer.addresseState.message}}</span
               >
 
               <!-- Monto a transferir -->
               <label for="transferAmount" class="form__label text-center"
                 >Monto a transferir</label
               >
-              <input-money v-model="transfer.transferAmount"></input-money>
-              <span class="alert alert--danger show"
-                >Ingresa un valor valido</span
+              <input-money
+                v-model="transfer.transferAmount"
+                @blur="validateTransferAmount"
+              ></input-money>
+              <span
+                :class="['alert', 'alert--danger', {show:transfer.transferAmountState.hasError}]"
+                style="margin-top: -1em;"
+                >{{transfer.transferAmountState.message}}</span
               >
 
-              <span class="alert alert--big alert--success show"
+              <span
+                :class="['alert', 'alert--big', 'alert--success', {show:false}]"
                 >Monto transferido</span
               >
 
-              <button class="btn btn--success">Hacer Transferencia</button>
+              <button class="btn btn--success" @click="validateTransfer">
+                Hacer Transferencia
+              </button>
             </div>
           </div>
           <!-- Fin del container -->
@@ -804,7 +828,7 @@
             </div>
             <h2 class="modal__title">Pago de sueldo</h2>
             <p class="modal__info">
-              Se va a pagar un sueldo por valorde
+              Se va a pagar un sueldo por valor de
               <span class="text-bold">$2.000</span> al jugador
               <span class="text-bold"
                 >{{modals.paySalary.player ? modals.paySalary.player.name :
@@ -820,6 +844,41 @@
                 Pagar
               </button>
             </div>
+          </div>
+        </div>
+
+        <div :class="['modal', {show: modals.transfer.visible}]" @click.self="modals.transfer.hidden()">
+          <div class="modal__content">
+            <div class="modal__close" @click="modals.transfer.hidden()">
+              <i class="fas fa-times-circle"></i>
+            </div>
+            <h2 class="modal__title">Transferencia</h2>
+            <div v-show="!modals.transfer.showAlert">
+              <p class="modal__info">
+                Se va a realizar una transferencia de la cuenta de
+                <span class="text-bold">{{modals.transfer.senderName}}</span>
+                hacía la cuenta de
+                <span class="text-bold">{{modals.transfer.addressedName}}</span>
+                por valor de
+                <span class="text-bold"
+                  >{{formatCurrency(modals.transfer.amount)}}</span
+                >
+              </p>
+  
+              <input
+                type="password"
+                name="password"
+                placeholder="Ingresa la contraseña"
+                class="form__input"
+                v-model="modals.transfer.senderPassword"
+              />
+            </div>
+
+            <span
+              :class="['alert', 'alert--big', {'alert--success' : !modals.transfer.processState.hasError, 'alert--danger': modals.transfer.processState.hasError, show: modals.transfer.showAlert}]"
+              >{{modals.transfer.processState.hasError ? modals.transfer.processState.message :  'Transferencia realizada'}}</span
+            >
+            <button class="btn btn--success" @click="makeTransfer" :disabled="modals.transfer.senderPassword.length <= 3">Hacer Transferencia</button>
           </div>
         </div>
 
