@@ -199,6 +199,7 @@
             </footer>
           </div>
           <!-- Fin de container principal -->
+
           <div class="container">
             <header class="container__header">
               <h2 class="container__title">Otros</h2>
@@ -242,7 +243,12 @@
                       </div>
                     </div>
                     <div class="player-card__actions">
-                      <button class="btn btn--success">Pagar Sueldo</button>
+                      <button
+                        class="btn btn--success"
+                        @click="modals.paySalary.show(player)"
+                      >
+                        Pagar Sueldo
+                      </button>
                     </div>
                     <button class="player-card__delete">X</button>
                   </div>
@@ -753,9 +759,9 @@
         >
           <div class="modal__content">
             <span class="modal__close" @click="modals.newPlayer.hidden()"
-              >×</span
-            >
-            <h2>Nuevo Jugador</h2>
+              ><i class="fas fa-times-circle"></i
+            ></span>
+            <h2 class="modal__title">Nuevo Jugador</h2>
             <input
               type="text"
               name="newPlayer"
@@ -790,6 +796,27 @@
             >
               Registrar jugador
             </button>
+          </div>
+        </div>
+
+        <!-- Modal para pagar sueldo -->
+        <div
+          :class="['modal', {show: modals.paySalary.visible}]"
+          @click.self="modals.paySalary.hidden()"
+        >
+          <div class="modal__content">
+            <div class="modal__close" @click="modals.paySalary.hidden()">
+              <i class="fas fa-times-circle"></i>
+            </div>
+            <h2 class="modal__title">Pago de sueldo</h2>
+            <p class="modal__info">
+              Se va a pagar un sueldo por valorde
+              <span class="text-bold">$2.000</span> al jugador
+              <span class="text-bold">{{modals.paySalary.player ? modals.paySalary.player.name : ''}}</span>
+            </p>
+            <div class="modal__actions">
+              <button class="btn btn--success" :disabled="typeof modals.paySalary.player === 'null'" @click="paySalary">Pagar</button>
+            </div>
           </div>
         </div>
       </div>

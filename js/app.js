@@ -54,6 +54,23 @@ class NewPlayerModal {
   }
 }
 
+class PaySalaryModal{
+  constructor(){
+    this.visible = false;
+    this.player = null;
+  }
+
+  show(player){
+    this.visible = true;
+    this.player = player;
+  }
+
+  hidden(){
+    this.visible = false;
+    this.player = null;
+  }
+}
+
 const vm = new Vue({
   el: '#app',
   data: {
@@ -64,6 +81,7 @@ const vm = new Vue({
     dashBoard: new DashBoard(),
     modals: {
       newPlayer: new NewPlayerModal(),
+      paySalary: new PaySalaryModal(),
     },
   },//Fin de data
   methods: {
@@ -200,6 +218,16 @@ const vm = new Vue({
         modal.hidden();
       }//Fin de if
     },
+    paySalary(){
+      //Para empesar recupero los datos del jugador
+      let player = this.modals.paySalary.player;
+      if(player && player.id){
+        let process = this.bank.paySalary(player.id);
+        if(process.result){
+          this.modals.paySalary.hidden();
+        }
+      }
+    },//Fin del metodo
   },//Fin de methods
   computed: {
     /**
