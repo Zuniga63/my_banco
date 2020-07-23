@@ -82,7 +82,34 @@ class PlayerTransaction {
     this.acountState.reset();
     this.amount = '';
     this.amountState.reset();
-    this.password=''
+    this.password = ''
+  }
+}
+
+class SaleAndBuy {
+  constructor() {
+    this.visible = true;
+    this.operationType = 'sale';
+    this.acountID = '';
+    this.acountState = new State();
+    this.assetType = 'title';
+    this.amount = '';
+    this.amountState = new State();
+    this.processState = new State();
+    this.showAlert = false;
+    this.password = '';
+  }
+
+  reset() {
+    this.visible = true;
+    this.operationType = 'sale';
+    this.acountID = '';
+    this.acountState.reset();
+    this.assetType = 'title';
+    this.amount = '';
+    this.amountState.reset();
+    // this.processState.reset();
+    // this.showAlert = false;
   }
 }
 
@@ -222,6 +249,7 @@ const vm = new Vue({
     dashBoard: new DashBoard(),
     transfer: new Transfer(),
     transaction: new PlayerTransaction(),
+    saleAndBuy: new SaleAndBuy(),
     modals: {
       newPlayer: new NewPlayerModal(),
       paySalary: new PaySalaryModal(),
@@ -475,6 +503,7 @@ const vm = new Vue({
     },
     //------------------------------------------------------------
     //METODOS PARA VALIDAR LAS TRANSACCIONES
+    //------------------------------------------------------------
     validateTransactionType() {
       let result = false;
       let type = this.transaction.type;
@@ -582,8 +611,98 @@ const vm = new Vue({
 
       }
 
-    }
+    },
     //------------------------------------------------------------
+    //METODOS PARA LA COMPRA Y VENTA DE ACTIVOS
+    //------------------------------------------------------------
+    validateSaleBuyAcount() {
+      let result = false;
+      let acountID = this.saleAndBuy.acountID;
+      let state = this.saleAndBuy.acountState;
+
+      //Primero verifico que es una cuenta exsitente
+      let acountExist = this.bank.players.some(p => p.id === acountID);
+
+      if (acountExist) {
+        state.reset();
+        result = true;
+      } else {
+        state.hasError = true;
+      }
+
+      return result;
+    },
+    validateSaleBuyAmount() {
+      let result = false;
+      let amount = this.deleteCurrencyFormater(this.saleAndBuy.amount);
+      let state = this.saleAndBuy.amountState;
+
+      if(!isNaN(amount) && amount > 0){
+        state.reset();
+        result = true;
+      }else{
+        state.hasError = true;
+      }
+
+      return result;
+    },
+    makeSaleOrBuy(){
+      let acountVal = this.validateSaleBuyAcount();
+      let amountVal = this.validateSaleBuyAmount();
+
+      if(acountVal && amountVal){
+        //Recupero los datos de la operacion
+        let acountID = this.saleAndBuy.acountID;
+        let password = this.saleAndBuy.password;
+        let assetType = this.saleAndBuy.assetType;
+        let amount = this.deleteCurrencyFormater(this.saleAndBuy.amount);
+        let operationType = this.saleAndBuy.operationType;
+        let process = null;
+
+        switch(operationType){
+          case 'sale':{
+            process = this.bank.sellAsset(acountID, password, assetType, amount);
+            this.saleAndBuy.showAlert = true;
+            if(process.result){
+              this.saleAndBuy.reset();
+              this.saleAndBuy.processState.hasError = false;
+              this.saleAndBuy.processState.message = "Venta realizada!";
+            }else{
+              this.saleAndBuy.processState.hasError = true;
+              this.saleAndBuy.processState.message = process.message;
+            }
+          }break;
+          case 'buy':{
+            process = this.bank.buyAsset(acountID, assetType, amount);
+            this.saleAndBuy.showAlert = true;
+            if(process.result){
+              this.saleAndBuy.reset();
+              this.saleAndBuy.processState.hasError = false;
+              this.saleAndBuy.processState.message = "Compra realizada!";
+            }else{
+              this.saleAndBuy.processState.hasError = true;
+              this.saleAndBuy.processState.message = process.message;
+            }
+          }
+        }
+
+        //Despues de 5 segundos se elimina la alerta
+        setTimeout(() => {
+          this.saleAndBuy.showAlert = false;
+          this.saleAndBuy.processState.reset();
+        }, 5000);
+      }
+    },
+    //------------------------------------------------------------
+    //UTILIDADES
+    //------------------------------------------------------------
+    deleteCurrencyFormater(value) {
+      value = value.replace('$', '');
+      value = value.split(".");
+      value = value.join('');
+      value = parseFloat(value);
+      return value;
+    },
   },//Fin de methods
   computed: {
     /**

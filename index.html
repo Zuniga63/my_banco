@@ -520,11 +520,11 @@
         </div>
 
         <!-- Compra y venta de activos -->
-        <div class="sale-and-buy">
+        <div class="sale-and-buy" v-show="saleAndBuy.visible">
           <div class="container">
             <div class="container__header">
               <h1 class="container__title">Ventas y Compras</h1>
-              <p class="container__subtitle">Se va a realizar una venta</p>
+              <p class="container__subtitle">Se va a realizar una {{saleAndBuy.operationType==='sale' ? 'venta' : 'compra'}}</p>
             </div>
             <div class="container__content">
               <!-- Definir el tipo de operacion -->
@@ -536,6 +536,8 @@
                     name="operationType"
                     id="sale"
                     class="radio__form"
+                    value="sale"
+                    v-model="saleAndBuy.operationType"
                   />
                   <label for="sale">Venta</label>
                 </div>
@@ -545,6 +547,8 @@
                     name="operationType"
                     id="buy"
                     class="radio__form"
+                    value="buy"
+                    v-model="saleAndBuy.operationType"
                   />
                   <label for="buy">Compra</label>
                 </div>
@@ -552,32 +556,38 @@
 
               <!-- Seleccion del titular -->
               <label for="acountOfTransaction" class="form__label"
-                >Comprador / Vendedor</label
+                >{{saleAndBuy.operationType==='sale' ? 'Vendedor' : 'Comprador'}}</label
               >
               <select
                 name="acountOfTransaction"
                 id="acountOfTransaction"
                 class="form__input"
+                v-model="saleAndBuy.acountID"
+                @blur="validateSaleBuyAcount"
               >
                 <option value="" selected disabled
-                  >Selecciona al comprador / Vendedor</option
+                  >Selecciona al {{saleAndBuy.operationType==='sale' ? 'Vendedor' : 'Comprador'}}</option
                 >
+                <option v-for="player in bank.players" :value="player.id" :key="player.id">{{player.name}} ({{formatCurrency(player.money)}})</option>
               </select>
-              <span class="alert alert--danger show"
+
+              <span :class="['alert', 'alert--danger', {show: saleAndBuy.acountState.hasError}]"
                 >Se debe seleccionar a un titular</span
               >
 
               <!-- Seleccion del tipo de activo -->
               <label class="form__label"
-                >Selecciona el activo a vender / Comprar</label
+                >Selecciona el activo a {{saleAndBuy.operationType==='sale' ? 'vender' : 'comprar'}}</label
               >
-              <div class="form__group form__group--evenly">
+              <div class="form__group form__group--evenly m-b-1">
                 <div class="radio-group">
                   <input
                     type="radio"
                     name="assetType"
                     id="assetTitle"
                     class="form__radio"
+                    value="title"
+                    v-model="saleAndBuy.assetType"
                   />
                   <label for="assetTitle">Titulo</label>
                 </div>
@@ -587,6 +597,8 @@
                     name="assetType"
                     id="assetLine"
                     class="form__radio"
+                    value="line"
+                    v-model="saleAndBuy.assetType"
                   />
                   <label for="assetLine">Linea</label>
                 </div>
@@ -596,6 +608,8 @@
                     name="assetType"
                     id="assetCustomPost"
                     class="form__radio"
+                    value="customPost"
+                    v-model="saleAndBuy.assetType"
                   />
                   <label for="assetCustomPost">Paso</label>
                 </div>
@@ -605,6 +619,8 @@
                     name="assetType"
                     id="assetHouse"
                     class="form__radio"
+                    value="house"
+                    v-model="saleAndBuy.assetType"
                   />
                   <label for="assetHouse">Casa</label>
                 </div>
@@ -614,31 +630,49 @@
                     name="assetType"
                     id="assetCastle"
                     class="form__radio"
+                    value="castle"
+                    v-model="saleAndBuy.assetType"
                   />
                   <label for="assetCastle">Castillo</label>
                 </div>
               </div>
 
               <!-- Valor del activo a transaccionar -->
-              <label for="assetAmount" class="form__label text-center"
+              <label for="assetAmount" class="form__label text-center text-bold"
                 >Valor del activo</label
               >
-              <input
-                type="text"
-                name="assetAmount"
+              
+
+              <input-money
                 id="assetAmount"
-                placeholder="$0"
-                class="form__input text-right"
-              />
-              <span class="alert alert--danger show"
+                v-model="saleAndBuy.amount"
+                @blur="validateSaleBuyAmount"
+              ></input-money>
+
+              <span :class="['alert', 'alert--danger', {show:saleAndBuy.amountState.hasError}]" style="margin-top: -1em;"
                 >Ingresa un valor valido</span
               >
 
-              <span class="alert alert--big alert--success show"
-                >Operacion Exitosa</span
+              <template v-if="saleAndBuy.operationType === 'sale'">
+                <label for="salePassword" class="form__label"
+                  >Contraseña</label
+                >
+                <input
+                  type="password"
+                  name="transctionPassword"
+                  id="salePassword"
+                  class="form__input"
+                  placeholder="Ingresa la contraseña"
+                  style="margin-bottom: 1em;"
+                  v-model="saleAndBuy.password"
+                />
+              </template>
+
+              <span :class="['alert', 'alert--big', {'alert--success': !saleAndBuy.processState.hasError, 'alert--danger': saleAndBuy.processState.hasError, show: saleAndBuy.showAlert}]"
+                >{{saleAndBuy.processState.message}}</span
               >
 
-              <button class="btn btn--success">Hacer Venta / Compra</button>
+              <button class="btn btn--success" @click="makeSaleOrBuy">Hacer {{saleAndBuy.operationType==='sale' ? 'venta' : 'compra'}}</button>
             </div>
           </div>
         </div>

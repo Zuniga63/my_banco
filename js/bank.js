@@ -528,7 +528,7 @@ class Bank extends Acount {
       let playerExist = this.players.some(p => p.id === playerID);
 
       if (playerExist) {
-        let player = this.players.filter(p => p.id === playerID);
+        let player = this.players.filter(p => p.id === playerID)[0];
 
         if (player.password === password) {
           if (player.money >= value) {
@@ -542,7 +542,7 @@ class Bank extends Acount {
             res.message = "Fondos insuficientes";
           }
         } else {
-          res.message('Contraseña incorrecta');
+          res.message= 'Contraseña incorrecta';
         }
       } else {
         res.message = "El jugador no existe";
@@ -568,7 +568,7 @@ class Bank extends Acount {
         let playerExist = this.players.some(p => p.id === playerID);
 
         if (playerExist) {
-          let player = this.players.filter(p => p.id === playerID);
+          let player = this.players.filter(p => p.id === playerID)[0];
 
           //Debito el dinero de la cuenta del banco
           super.cashWhitdrawal(value);
