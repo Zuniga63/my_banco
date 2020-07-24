@@ -41,7 +41,7 @@ class DashBoard {
 
 class Transfer {
   constructor() {
-    this.visible = true;
+    this.visible = false;
     this.senderID = '';
     this.senderState = new State();
     this.addressedID = '';
@@ -52,7 +52,7 @@ class Transfer {
   }
 
   reset() {
-    this.visible = true;
+    // this.visible = true;
     this.senderID = '';
     this.senderState.hasError = false;
     this.addressedID = '';
@@ -65,7 +65,7 @@ class Transfer {
 
 class PlayerTransaction {
   constructor() {
-    this.visible = true;
+    this.visible = false;
     this.type = 'deposit';
     this.acountID = '';
     this.acountState = new State();
@@ -88,7 +88,7 @@ class PlayerTransaction {
 
 class SaleAndBuy {
   constructor() {
-    this.visible = true;
+    this.visible = false;
     this.operationType = 'sale';
     this.acountID = '';
     this.acountState = new State();
@@ -101,7 +101,7 @@ class SaleAndBuy {
   }
 
   reset() {
-    this.visible = true;
+    // this.visible = true;
     this.operationType = 'sale';
     this.acountID = '';
     this.acountState.reset();
@@ -110,6 +110,51 @@ class SaleAndBuy {
     this.amountState.reset();
     // this.processState.reset();
     // this.showAlert = false;
+  }
+}
+
+class AwardsView{
+  constructor(){
+    this.visible = true;
+    this.accountID = '';
+    this.accountState = new State();
+    this.awardName = '';
+    this.awardNameState = new State();
+    this.process = new State();
+    this.showResult = false;
+  }
+
+  reset(){
+    this.accountID = '';
+    this.accountState.reset();
+    this.awardName = "";
+    this.awardNameState.reset();
+  }
+}
+
+class awardPrizeModal{
+  constructor(){
+    this.visible = false;
+    this.playerName = "";
+    this.awardAmount = "";
+    this.awardName = "";
+    this.info = ""
+  }
+
+  show(playerName, awardAmount, awardName, info){
+    this.visible=true;
+    this.playerName = playerName;
+    this.awardName = awardName;
+    this.awardAmount = awardAmount;
+    this.info = info;
+  }
+
+  hidden(){
+    this.visible = false;
+    this.playerName = "";
+    this.awardAmount = "";
+    this.awardName = "";
+    this.info = ""
   }
 }
 
@@ -250,10 +295,12 @@ const vm = new Vue({
     transfer: new Transfer(),
     transaction: new PlayerTransaction(),
     saleAndBuy: new SaleAndBuy(),
+    awards: new AwardsView(),
     modals: {
       newPlayer: new NewPlayerModal(),
       paySalary: new PaySalaryModal(),
       transfer: new TransferModal(),
+      awardPrize: new awardPrizeModal(),
     },
   },//Fin de data
   methods: {
@@ -690,6 +737,109 @@ const vm = new Vue({
         setTimeout(() => {
           this.saleAndBuy.showAlert = false;
           this.saleAndBuy.processState.reset();
+        }, 5000);
+      }
+    },
+    //------------------------------------------------------------
+    //METODOS PARA ENTREGAR PREMIOS
+    //------------------------------------------------------------
+    validateAwardAccount(){
+      let result = false;
+      let account = this.awards.accountID;
+      let state = this.awards.accountState;
+      let accountExist = this.bank.players.some(p => p.id === account);
+
+      if(accountExist){
+        state.reset();
+        result = true;
+      }else{
+        state.hasError = true;
+      }
+
+      return result;
+    },
+    validateAwardName(){
+      let result = false;
+      let awardName = this.awards.awardName;
+      let state = this.awards.awardNameState;
+
+      if(awardName){
+        state.reset();
+        result = true;
+      }else{
+        state.hasError = true;
+      }
+
+      return result;
+    },
+    validateAwardPize(){
+      let accountVal = this.validateAwardAccount();
+      let awardNameVal = this.validateAwardName();
+      let accountID = this.awards.accountID;
+      let awardName = this.awards.awardName;
+      let accountName = "";
+      let spanishName = "";
+      let info = "";
+      let amount = "";
+
+      if(accountVal && awardNameVal){
+        accountName = this.bank.players.filter(p => p.id === accountID)[0].name;
+        switch(awardName){
+          case 'bambi':{
+            spanishName = "Premio Bambi";
+            info = "por pasar de Lotería a Sorpresa o de Sorpresa a Lotería";
+            amount = this.formatCurrency(BAMBI_AWARD);
+          }break;
+          case 'pinocchio':{
+            spanishName = "Premio Pinocho";
+            info = "por construir un castillo en cada propiedad del mismo color";
+            amount = this.formatCurrency(PINOCCHIO_AWARD);
+          }break;
+          case 'daisy':{
+            spanishName = "Premio Daisy";
+            info = "por lograr tres pares consecutivos";
+            amount = this.formatCurrency(DAISY_AWARD);
+          }break
+          case 'cinderella':{
+            spanishName = "Premio Cenicienta";
+            info = "por construir dos casas en cada propiedad del mismo color";
+            amount = this.formatCurrency(CINDERELLA_AWARD);
+          }break;
+          default:{
+            spanishName = "Error del Sistema";
+            info = "";
+            amount = this.formatCurrency(0);
+          }break;
+        }
+
+        this.modals.awardPrize.show(accountName, amount, spanishName, info);
+      }
+
+    },
+    awardPrize(){
+      let accountVal = this.validateAwardAccount();
+      let awardNameVal = this.validateAwardName();
+      let accountID = this.awards.accountID;
+      let awardName = this.awards.awardName;
+
+      if(accountVal && awardNameVal){
+        let process = this.bank.awardPrize(accountID, AwardList[awardName]);
+
+        if(process.result){
+          this.awards.process.hasError = false;
+          this.awards.process.message = "Premio Entregado";
+          this.awards.showResult = true;
+          this.awards.reset();
+        }else{
+          this.awards.process.hasError = true;
+          this.awards.process.message = process.message;
+          this.awards.showResult = true;
+        }
+
+        this.modals.awardPrize.hidden();
+        setTimeout(() => {
+          this.awards.showResult = false;
+          this.awards.process.reset();
         }, 5000);
       }
     },

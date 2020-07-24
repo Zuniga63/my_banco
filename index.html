@@ -514,7 +514,9 @@
                 >{{transaction.process.message}}</span
               >
 
-              <button class="btn btn--success" @click="makeTransaction">Realizar transaccion</button>
+              <button class="btn btn--success" @click="makeTransaction">
+                Realizar transaccion
+              </button>
             </div>
           </div>
         </div>
@@ -524,7 +526,10 @@
           <div class="container">
             <div class="container__header">
               <h1 class="container__title">Ventas y Compras</h1>
-              <p class="container__subtitle">Se va a realizar una {{saleAndBuy.operationType==='sale' ? 'venta' : 'compra'}}</p>
+              <p class="container__subtitle">
+                Se va a realizar una {{saleAndBuy.operationType==='sale' ?
+                'venta' : 'compra'}}
+              </p>
             </div>
             <div class="container__content">
               <!-- Definir el tipo de operacion -->
@@ -556,7 +561,8 @@
 
               <!-- Seleccion del titular -->
               <label for="acountOfTransaction" class="form__label"
-                >{{saleAndBuy.operationType==='sale' ? 'Vendedor' : 'Comprador'}}</label
+                >{{saleAndBuy.operationType==='sale' ? 'Vendedor' :
+                'Comprador'}}</label
               >
               <select
                 name="acountOfTransaction"
@@ -566,18 +572,26 @@
                 @blur="validateSaleBuyAcount"
               >
                 <option value="" selected disabled
-                  >Selecciona al {{saleAndBuy.operationType==='sale' ? 'Vendedor' : 'Comprador'}}</option
+                  >Selecciona al {{saleAndBuy.operationType==='sale' ?
+                  'Vendedor' : 'Comprador'}}</option
                 >
-                <option v-for="player in bank.players" :value="player.id" :key="player.id">{{player.name}} ({{formatCurrency(player.money)}})</option>
+                <option
+                  v-for="player in bank.players"
+                  :value="player.id"
+                  :key="player.id"
+                  >{{player.name}} ({{formatCurrency(player.money)}})</option
+                >
               </select>
 
-              <span :class="['alert', 'alert--danger', {show: saleAndBuy.acountState.hasError}]"
+              <span
+                :class="['alert', 'alert--danger', {show: saleAndBuy.acountState.hasError}]"
                 >Se debe seleccionar a un titular</span
               >
 
               <!-- Seleccion del tipo de activo -->
               <label class="form__label"
-                >Selecciona el activo a {{saleAndBuy.operationType==='sale' ? 'vender' : 'comprar'}}</label
+                >Selecciona el activo a {{saleAndBuy.operationType==='sale' ?
+                'vender' : 'comprar'}}</label
               >
               <div class="form__group form__group--evenly m-b-1">
                 <div class="radio-group">
@@ -641,7 +655,6 @@
               <label for="assetAmount" class="form__label text-center text-bold"
                 >Valor del activo</label
               >
-              
 
               <input-money
                 id="assetAmount"
@@ -649,14 +662,14 @@
                 @blur="validateSaleBuyAmount"
               ></input-money>
 
-              <span :class="['alert', 'alert--danger', {show:saleAndBuy.amountState.hasError}]" style="margin-top: -1em;"
+              <span
+                :class="['alert', 'alert--danger', {show:saleAndBuy.amountState.hasError}]"
+                style="margin-top: -1em;"
                 >Ingresa un valor valido</span
               >
 
               <template v-if="saleAndBuy.operationType === 'sale'">
-                <label for="salePassword" class="form__label"
-                  >Contraseña</label
-                >
+                <label for="salePassword" class="form__label">Contraseña</label>
                 <input
                   type="password"
                   name="transctionPassword"
@@ -668,17 +681,20 @@
                 />
               </template>
 
-              <span :class="['alert', 'alert--big', {'alert--success': !saleAndBuy.processState.hasError, 'alert--danger': saleAndBuy.processState.hasError, show: saleAndBuy.showAlert}]"
+              <span
+                :class="['alert', 'alert--big', {'alert--success': !saleAndBuy.processState.hasError, 'alert--danger': saleAndBuy.processState.hasError, show: saleAndBuy.showAlert}]"
                 >{{saleAndBuy.processState.message}}</span
               >
 
-              <button class="btn btn--success" @click="makeSaleOrBuy">Hacer {{saleAndBuy.operationType==='sale' ? 'venta' : 'compra'}}</button>
+              <button class="btn btn--success" @click="makeSaleOrBuy">
+                Hacer {{saleAndBuy.operationType==='sale' ? 'venta' : 'compra'}}
+              </button>
             </div>
           </div>
         </div>
 
         <!-- Entrega de premios -->
-        <div class="awards">
+        <div class="awards" v-show="awards.visible">
           <div class="container">
             <div class="container__header">
               <h1 class="container__title">Entrega de premios</h1>
@@ -686,12 +702,28 @@
             <div class="container__content">
               <!-- Seleccion del jugador -->
               <label for="acountAward" class="form__label">Jugador</label>
-              <select name="acountAward" id="acountAward" class="form__input">
+              <select
+                name="acountAward"
+                id="acountAward"
+                class="form__input"
+                v-model="awards.accountID"
+                @blur="validateAwardAccount"
+                @change="validateAwardAccount"
+              >
                 <option value="" selected disabled
                   >Selecciona a un jugador</option
                 >
+                <option
+                  v-for="player in bank.players"
+                  :value="player.id"
+                  :key="player.id"
+                  >{{player.name}}</option
+                >
               </select>
-              <span class="alert alert--danger show"
+
+              <span
+                class="alert alert--danger"
+                :class="{show: awards.accountState.hasError}"
                 >Se debe seleccionar un jugador</span
               >
 
@@ -704,6 +736,8 @@
                     name="awardType"
                     id="bambiAward"
                     class="form__radio"
+                    value="bambi"
+                    v-model="awards.awardName"
                   />
                   <label for="bambiAward">Bambi</label>
                 </div>
@@ -713,6 +747,8 @@
                     name="awardType"
                     id="daisyAward"
                     class="form__radio"
+                    value="daisy"
+                    v-model="awards.awardName"
                   />
                   <label for="daisyAward">Daisy</label>
                 </div>
@@ -722,6 +758,8 @@
                     name="awardType"
                     id="pinocchioAward"
                     class="form__radio"
+                    value="pinocchio"
+                    v-model="awards.awardName"
                   />
                   <label for="pinocchioAward">Pinocho</label>
                 </div>
@@ -731,15 +769,25 @@
                     name="awardType"
                     id="cinderellaAward"
                     class="form__radio"
+                    value="cinderella"
+                    v-model="awards.awardName"
                   />
                   <label for="cinderellaAward">Cenicienta</label>
                 </div>
               </div>
 
-              <span class="alert alert--big alert--success show"
-                >Premio entregado</span
+              <span
+                class="alert alert--danger"
+                :class="{show: awards.awardNameState.hasError}"
+                >Se debe seleccionar un premio</span
               >
-              <button class="btn btn--success">Entregar premio</button>
+
+              <span
+                class="alert alert--big"
+                :class="{'alert--success': !awards.process.hasError, 'alert--danger': awards.process.hasError, show: awards.showResult}"
+                >{{awards.process.message}}</span
+              >
+              <button class="btn btn--success" @click="validateAwardPize">Entregar premio</button>
             </div>
           </div>
         </div>
@@ -910,6 +958,7 @@
           </div>
         </div>
 
+        <!-- Modal para transferencia de dinero -->
         <div
           :class="['modal', {show: modals.transfer.visible}]"
           @click.self="modals.transfer.hidden()"
@@ -955,7 +1004,35 @@
           </div>
         </div>
 
-        <!-- Modal para cofirmar la transferencia -->
+        <!-- Modal para cofirmar la entrega del premio -->
+        <div
+          :class="['modal', {show: modals.awardPrize.visible}]"
+          @click.self="modals.awardPrize.hidden()"
+        >
+          <div class="modal__content">
+            <div class="modal__close" @click="modals.awardPrize.hidden()">
+              <i class="fas fa-times-circle"></i>
+            </div>
+            <h2 class="modal__title">{{modals.awardPrize.awardName}}</h2>
+            <p class="modal__info">
+              El Banco le obsequía al jugador 
+              <span class="text-bold">{{modals.awardPrize.playerName}}</span> 
+              la suma de 
+              <span class="text-bold">{{modals.awardPrize.awardAmount}}</span> 
+              {{modals.awardPrize.info}}
+            </p>
+            <div class="modal__actions">
+              <button
+                class="btn btn--success"
+                :disabled="typeof modals.paySalary.player === 'null'"
+                @click="awardPrize"
+              >
+                Pagar
+              </button>
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <!-- Icons made by <a href="https://creativemarket.com/eucalyp" title="Eucalyp">Eucalyp</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a> -->
