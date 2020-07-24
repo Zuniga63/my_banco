@@ -252,7 +252,7 @@ class Lands {
   constructor() {
     this.landOfTheFuture = new Land(1, TaxType.landOfTheFuture);
     this.landOfTheBorder = new Land(2, TaxType.landOfTheBorder);
-    this.aventureLand = new Land(3, TaxType.adventureLand);
+    this.adventureLand = new Land(3, TaxType.adventureLand);
   }
 }
 
@@ -542,7 +542,7 @@ class Bank extends Acount {
             res.message = "Fondos insuficientes";
           }
         } else {
-          res.message= 'Contraseña incorrecta';
+          res.message = 'Contraseña incorrecta';
         }
       } else {
         res.message = "El jugador no existe";
@@ -653,7 +653,7 @@ class Bank extends Acount {
    * @param {string} taxName Nombre del impuesto
    * @param {number} amount Valor del impuesto
    */
-  colletTax(playerID, taxName, amount) {
+  colletTax(playerID, taxName, amount, playerPassword) {
     let res = new Result();
 
     if (playerID && typeof playerID === 'number' && taxName && amount && typeof amount === 'number' && amount > 0) {
@@ -661,34 +661,38 @@ class Bank extends Acount {
 
       if (playerExist) {
         let player = this.players.filter(p => p.id === playerID)[0];
-        if (player.money >= amount) {
-          if (taxName === TaxType.bank || taxName === TaxType.landOfTheBorder
-            || taxName === TaxType.landOfTheFuture || taxName === TaxType.adventureLand) {
-            //Decuento el dinero del jugador
-            player.cashWhitdrawal(amount);
+        if (player.password === playerPassword) {
+          if (player.money >= amount) {
+            if (taxName === TaxType.bank || taxName === TaxType.landOfTheBorder
+              || taxName === TaxType.landOfTheFuture || taxName === TaxType.adventureLand) {
+              //Decuento el dinero del jugador
+              player.cashWhitdrawal(amount);
 
-            //Abono el dinero segun el tipo de impuesto
-            switch (taxName) {
-              case TaxType.bank:
-                super.cashDeposit(amount);
-                break;
-              case TaxType.landOfTheFuture:
-                this.lands.landOfTheFuture.cashDeposit(amount);
-                break;
-              case TaxType.landOfTheBorder:
-                this.lands.landOfTheBorder.cashDeposit(amount);
-                break;
-              case TaxType.adventureLand:
-                this.lands.adventureLand.cashDeposit(amount);
-                break;
-            }//Fin de swith
+              //Abono el dinero segun el tipo de impuesto
+              switch (taxName) {
+                case TaxType.bank:
+                  super.cashDeposit(amount);
+                  break;
+                case TaxType.landOfTheFuture:
+                  this.lands.landOfTheFuture.cashDeposit(amount);
+                  break;
+                case TaxType.landOfTheBorder:
+                  this.lands.landOfTheBorder.cashDeposit(amount);
+                  break;
+                case TaxType.adventureLand:
+                  this.lands.adventureLand.cashDeposit(amount);
+                  break;
+              }//Fin de swith
 
-            res.result = true;
+              res.result = true;
+            } else {
+              res.message = "No se seleccionó impuesto";
+            }
           } else {
-            res.message = "No se seleccionó impuesto";
+            res.message = "Saldo insuficiente";
           }
         } else {
-          res.message = "Saldo insuficiente";
+          res.message = "Contraseña incorrecta";
         }
       } else {
         res.message = "El jugador no existe";

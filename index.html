@@ -264,18 +264,18 @@
                   <h2 class="dashboard-card__title">Departamento de Aduanas</h2>
                   <div class="dashboard-card__body">
                     <p class="dashboard-card__section">
-                      Tierra de la frontera: <span class="text-bold">$0</span>
+                      {{bank.lands.landOfTheBorder.name}}: <span class="text-bold">{{formatCurrency(bank.lands.landOfTheBorder.money)}}</span>
                     </p>
                     <p class="dashboard-card__section">
-                      Tierra del futuro: <span class="text-bold">$0</span>
+                      {{bank.lands.landOfTheFuture.name}}: <span class="text-bold">{{formatCurrency(bank.lands.landOfTheFuture.money)}}</span>
                     </p>
                     <p class="dashboard-card__section">
-                      Tierra de la aventura: <span class="text-bold">$0</span>
+                      {{bank.lands.adventureLand.name}}: <span class="text-bold">{{formatCurrency(bank.lands.adventureLand.money)}}</span>
                     </p>
                   </div>
                   <!-- Fin del body -->
                   <p class="dashboard-card__footer">
-                    Dinero: <span class="text-bold">$0</span>
+                    Dinero: <span class="text-bold">{{formatCurrency(moneyInCustoms)}}</span>
                   </p>
                 </div>
                 <!-- Fin de la tarjeta -->
@@ -787,13 +787,15 @@
                 :class="{'alert--success': !awards.process.hasError, 'alert--danger': awards.process.hasError, show: awards.showResult}"
                 >{{awards.process.message}}</span
               >
-              <button class="btn btn--success" @click="validateAwardPize">Entregar premio</button>
+              <button class="btn btn--success" @click="validateAwardPize">
+                Entregar premio
+              </button>
             </div>
           </div>
         </div>
 
         <!-- Cobro de impuestos -->
-        <div class="taxes">
+        <div class="taxes" v-show="taxesView.visible">
           <div class="container">
             <div class="container__header">
               <h1 class="container__title">Impuestos</h1>
@@ -803,35 +805,104 @@
               <label for="taxType" class="form__label"
                 >Departamento de impuesto</label
               >
-              <select name="taxType" id="taxType" class="form__input">
+              <select
+                name="taxType"
+                id="taxType"
+                class="form__input"
+                v-model="taxesView.taxDepartment"
+                @blur="validateTaxDepartment"
+                @change="validateTaxDepartment"
+              >
                 <option value="" selected disabled
                   >Selecciona al departamento</option
                 >
-                <option value="1">Banco</option>
-                <option value="1">Tierra de la Fantasía</option>
-                <option value="1">Tierra de la Aventura</option>
-                <option value="1">Tierra de la frontera</option>
+                <option value="bank">Banco</option>
+                <option value="adventureLand">Tierra de la Aventura</option>
+                <option value="landOfTheFuture">Tierra del Futuro</option>
+                <option value="landOfTheBorder">Tierra de la frontera</option>
               </select>
 
+              <span
+                class="alert alert--danger"
+                :class="{show: taxesView.taxDepartmentState.hasError}"
+              >
+                Se debe seleccionar uno
+              </span>
+
+              <!-- Ingresar el nombre del contributyente-->
+              <label for="taxPayer" class="form__label">Contribuyente</label>
+
+              <select
+                name="taxPayer"
+                id="taxPayer"
+                class="form__input"
+                v-model="taxesView.accountID"
+                @blur="validateTaxPayer"
+                @change="validateTaxPayer"
+              >
+                <option value="" disabled selected
+                  >Selecciona a un Contribuyente</option
+                >
+                <option
+                  v-for="player in bank.players"
+                  :value="player.id"
+                  :key="player.id"
+                  >{{player.name}} ({{formatCurrency(player.money)}})</option
+                >
+              </select>
+
+              <span
+                class="alert alert--danger"
+                :class="{show: taxesView.accountState.hasError}"
+              >
+                Se debe seleccionar al Contribuyente
+              </span>
+
               <!-- Ingresa el valor del impuesto -->
-              <label for="taxAmount" class="form__label text-center"
+              <label for="taxAmount" class="form__label text-center text-bold"
                 >Valor a cobrar</label
               >
-              <input
-                type="text"
-                name="taxAmount"
+
+              <input-money
                 id="taxAmount"
-                class="form__input text-right"
-                placeholder="$0"
-              />
-              <span class="alert alert--danger show"
+                v-model="taxesView.amount"
+                @blur="validateTaxAmount"
+              ></input-money>
+
+              <span
+                class="alert alert--danger"
+                :class="{show:taxesView.amountState.hasError}"
+                style="margin-top: -1em;"
                 >Ingresa un valor valido</span
               >
 
-              <span class="alert alert--big alert--danger show"
-                >Saldo Insuficiente</span
+              <!-- Ingreso de la contraseña -->
+              <label for="taxPassword" class="form__label text-center text-bold"
+                >Contraseña</label
               >
-              <button class="btn btn--success">Cobrar Impuesto</button>
+
+              <input
+                type="password"
+                name="taxPassword"
+                id="taxPassword"
+                class="form__input"
+                v-model="taxesView.password"
+                @blur="validatePassword"
+              />
+
+              <span
+                class="alert alert--danger"
+                :class="{show: taxesView.passwordState.hasError}"
+                >Debe contener almenos 4 caracteres</span
+              >
+
+              <span
+                class="alert alert--big"
+                :class="{'alert--danger': taxesView.process.hasError, 'alert--success': !taxesView.process.hasError, show: taxesView.showAlert}"
+                >{{taxesView.process.message}}</span
+              >
+              <br />
+              <button class="btn btn--success" @click="collectTheTax">Cobrar Impuesto</button>
             </div>
           </div>
         </div>
@@ -1015,10 +1086,10 @@
             </div>
             <h2 class="modal__title">{{modals.awardPrize.awardName}}</h2>
             <p class="modal__info">
-              El Banco le obsequía al jugador 
-              <span class="text-bold">{{modals.awardPrize.playerName}}</span> 
-              la suma de 
-              <span class="text-bold">{{modals.awardPrize.awardAmount}}</span> 
+              El Banco le obsequía al jugador
+              <span class="text-bold">{{modals.awardPrize.playerName}}</span>
+              la suma de
+              <span class="text-bold">{{modals.awardPrize.awardAmount}}</span>
               {{modals.awardPrize.info}}
             </p>
             <div class="modal__actions">
@@ -1032,7 +1103,6 @@
             </div>
           </div>
         </div>
-
       </div>
 
       <!-- Icons made by <a href="https://creativemarket.com/eucalyp" title="Eucalyp">Eucalyp</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a> -->

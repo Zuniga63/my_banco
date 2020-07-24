@@ -113,9 +113,9 @@ class SaleAndBuy {
   }
 }
 
-class AwardsView{
-  constructor(){
-    this.visible = true;
+class AwardsView {
+  constructor() {
+    this.visible = false;
     this.accountID = '';
     this.accountState = new State();
     this.awardName = '';
@@ -124,7 +124,7 @@ class AwardsView{
     this.showResult = false;
   }
 
-  reset(){
+  reset() {
     this.accountID = '';
     this.accountState.reset();
     this.awardName = "";
@@ -132,8 +132,8 @@ class AwardsView{
   }
 }
 
-class awardPrizeModal{
-  constructor(){
+class awardPrizeModal {
+  constructor() {
     this.visible = false;
     this.playerName = "";
     this.awardAmount = "";
@@ -141,15 +141,15 @@ class awardPrizeModal{
     this.info = ""
   }
 
-  show(playerName, awardAmount, awardName, info){
-    this.visible=true;
+  show(playerName, awardAmount, awardName, info) {
+    this.visible = true;
     this.playerName = playerName;
     this.awardName = awardName;
     this.awardAmount = awardAmount;
     this.info = info;
   }
 
-  hidden(){
+  hidden() {
     this.visible = false;
     this.playerName = "";
     this.awardAmount = "";
@@ -242,6 +242,33 @@ class TransferModal {
   }
 }
 
+class TaxesView {
+  constructor() {
+    this.visible = true;
+    this.accountID = "";
+    this.accountState = new State();
+    this.taxDepartment = "";
+    this.taxDepartmentState = new State();
+    this.amount = "";
+    this.password = "";
+    this.passwordState = new State();
+    this.amountState = new State();
+    this.process = new State();
+    this.showAlert = false;
+  }
+
+  reset() {
+    this.accountID = "";
+    this.accountState.reset();
+    this.taxDepartment = "";
+    this.taxDepartmentState.reset();
+    this.amount = "";
+    this.amountState.reset();
+    this.password = "";
+    this.passwordState.reset();
+  }
+}
+
 Vue.component('input-money', {
   props: ['value'],
   template: `
@@ -296,6 +323,7 @@ const vm = new Vue({
     transaction: new PlayerTransaction(),
     saleAndBuy: new SaleAndBuy(),
     awards: new AwardsView(),
+    taxesView: new TaxesView(),
     modals: {
       newPlayer: new NewPlayerModal(),
       paySalary: new PaySalaryModal(),
@@ -684,20 +712,20 @@ const vm = new Vue({
       let amount = this.deleteCurrencyFormater(this.saleAndBuy.amount);
       let state = this.saleAndBuy.amountState;
 
-      if(!isNaN(amount) && amount > 0){
+      if (!isNaN(amount) && amount > 0) {
         state.reset();
         result = true;
-      }else{
+      } else {
         state.hasError = true;
       }
 
       return result;
     },
-    makeSaleOrBuy(){
+    makeSaleOrBuy() {
       let acountVal = this.validateSaleBuyAcount();
       let amountVal = this.validateSaleBuyAmount();
 
-      if(acountVal && amountVal){
+      if (acountVal && amountVal) {
         //Recupero los datos de la operacion
         let acountID = this.saleAndBuy.acountID;
         let password = this.saleAndBuy.password;
@@ -706,27 +734,27 @@ const vm = new Vue({
         let operationType = this.saleAndBuy.operationType;
         let process = null;
 
-        switch(operationType){
-          case 'sale':{
+        switch (operationType) {
+          case 'sale': {
             process = this.bank.sellAsset(acountID, password, assetType, amount);
             this.saleAndBuy.showAlert = true;
-            if(process.result){
+            if (process.result) {
               this.saleAndBuy.reset();
               this.saleAndBuy.processState.hasError = false;
               this.saleAndBuy.processState.message = "Venta realizada!";
-            }else{
+            } else {
               this.saleAndBuy.processState.hasError = true;
               this.saleAndBuy.processState.message = process.message;
             }
-          }break;
-          case 'buy':{
+          } break;
+          case 'buy': {
             process = this.bank.buyAsset(acountID, assetType, amount);
             this.saleAndBuy.showAlert = true;
-            if(process.result){
+            if (process.result) {
               this.saleAndBuy.reset();
               this.saleAndBuy.processState.hasError = false;
               this.saleAndBuy.processState.message = "Compra realizada!";
-            }else{
+            } else {
               this.saleAndBuy.processState.hasError = true;
               this.saleAndBuy.processState.message = process.message;
             }
@@ -743,36 +771,36 @@ const vm = new Vue({
     //------------------------------------------------------------
     //METODOS PARA ENTREGAR PREMIOS
     //------------------------------------------------------------
-    validateAwardAccount(){
+    validateAwardAccount() {
       let result = false;
       let account = this.awards.accountID;
       let state = this.awards.accountState;
       let accountExist = this.bank.players.some(p => p.id === account);
 
-      if(accountExist){
+      if (accountExist) {
         state.reset();
         result = true;
-      }else{
+      } else {
         state.hasError = true;
       }
 
       return result;
     },
-    validateAwardName(){
+    validateAwardName() {
       let result = false;
       let awardName = this.awards.awardName;
       let state = this.awards.awardNameState;
 
-      if(awardName){
+      if (awardName) {
         state.reset();
         result = true;
-      }else{
+      } else {
         state.hasError = true;
       }
 
       return result;
     },
-    validateAwardPize(){
+    validateAwardPize() {
       let accountVal = this.validateAwardAccount();
       let awardNameVal = this.validateAwardName();
       let accountID = this.awards.accountID;
@@ -782,55 +810,55 @@ const vm = new Vue({
       let info = "";
       let amount = "";
 
-      if(accountVal && awardNameVal){
+      if (accountVal && awardNameVal) {
         accountName = this.bank.players.filter(p => p.id === accountID)[0].name;
-        switch(awardName){
-          case 'bambi':{
+        switch (awardName) {
+          case 'bambi': {
             spanishName = "Premio Bambi";
             info = "por pasar de Lotería a Sorpresa o de Sorpresa a Lotería";
             amount = this.formatCurrency(BAMBI_AWARD);
-          }break;
-          case 'pinocchio':{
+          } break;
+          case 'pinocchio': {
             spanishName = "Premio Pinocho";
             info = "por construir un castillo en cada propiedad del mismo color";
             amount = this.formatCurrency(PINOCCHIO_AWARD);
-          }break;
-          case 'daisy':{
+          } break;
+          case 'daisy': {
             spanishName = "Premio Daisy";
             info = "por lograr tres pares consecutivos";
             amount = this.formatCurrency(DAISY_AWARD);
-          }break
-          case 'cinderella':{
+          } break
+          case 'cinderella': {
             spanishName = "Premio Cenicienta";
             info = "por construir dos casas en cada propiedad del mismo color";
             amount = this.formatCurrency(CINDERELLA_AWARD);
-          }break;
-          default:{
+          } break;
+          default: {
             spanishName = "Error del Sistema";
             info = "";
             amount = this.formatCurrency(0);
-          }break;
+          } break;
         }
 
         this.modals.awardPrize.show(accountName, amount, spanishName, info);
       }
 
     },
-    awardPrize(){
+    awardPrize() {
       let accountVal = this.validateAwardAccount();
       let awardNameVal = this.validateAwardName();
       let accountID = this.awards.accountID;
       let awardName = this.awards.awardName;
 
-      if(accountVal && awardNameVal){
+      if (accountVal && awardNameVal) {
         let process = this.bank.awardPrize(accountID, AwardList[awardName]);
 
-        if(process.result){
+        if (process.result) {
           this.awards.process.hasError = false;
           this.awards.process.message = "Premio Entregado";
           this.awards.showResult = true;
           this.awards.reset();
-        }else{
+        } else {
           this.awards.process.hasError = true;
           this.awards.process.message = process.message;
           this.awards.showResult = true;
@@ -841,6 +869,101 @@ const vm = new Vue({
           this.awards.showResult = false;
           this.awards.process.reset();
         }, 5000);
+      }
+    },
+    //------------------------------------------------------------
+    //METODOS PARA COBRAR IMPUESTOS
+    //------------------------------------------------------------
+    validateTaxPayer() {
+      let result = false;
+      let taxPayerId = this.taxesView.accountID;
+      let state = this.taxesView.accountState;
+      let taxPayerExist = this.bank.players.some(p => p.id === taxPayerId);
+
+      if (taxPayerExist) {
+        state.reset();
+        result = true;
+      } else {
+        state.hasError = true;
+      }
+
+      return result;
+    },
+    validateTaxDepartment() {
+      let result = false;
+      let taxDepartment = this.taxesView.taxDepartment;
+      let state = this.taxesView.taxDepartmentState;
+
+      if (taxDepartment === 'bank' || taxDepartment === 'adventureLand' || taxDepartment == 'landOfTheFuture' || taxDepartment === 'landOfTheBorder') {
+        state.reset();
+        result = true;
+      } else {
+        state.hasError = true;
+      }
+
+      return result;
+    },
+    validateTaxAmount() {
+      let result = false;
+      let amount = this.deleteCurrencyFormater(this.taxesView.amount);
+      let state = this.taxesView.amountState;
+
+      if (!isNaN(amount) && amount > 0) {
+        state.reset();
+        result = true;
+      } else {
+        state.hasError = true;
+      }
+
+      return result;
+    },
+    validatePassword() {
+      let result = false;
+      let password = this.taxesView.password;
+      let state = this.taxesView.passwordState;
+
+      if (password && password.length > 3) {
+        state.reset();
+        result = true;
+      } else {
+        state.hasError = true;
+      }
+
+      return result;
+    },
+    collectTheTax() {
+      let taxPayerVal = this.validateTaxPayer();
+      let departmentVal = this.validateTaxDepartment();
+      let amountVal = this.validateTaxAmount();
+      let passwordVal = this.validatePassword();
+
+      if (taxPayerVal && departmentVal && amountVal && passwordVal) {
+        let taxPayerId = this.taxesView.accountID;
+        let taxDepartment = this.taxesView.taxDepartment;
+        let amount = this.deleteCurrencyFormater(this.taxesView.amount);
+        let password = this.taxesView.password;
+
+        taxDepartment = TaxType[taxDepartment];
+
+        let process = this.bank.colletTax(taxPayerId, taxDepartment, amount, password);
+
+        if(process.result){
+          this.taxesView.showAlert = true;
+          this.taxesView.process.hasError = false;
+          this.taxesView.process.message ="Transacción Exitosa!";
+
+          this.taxesView.reset();
+        }else{
+          this.taxesView.showAlert = true;
+          this.taxesView.process.hasError = true;
+          this.taxesView.process.message = process.message;
+        }
+
+        setTimeout(() => {
+          this.taxesView.showAlert = false;
+          this.taxesView.process.reset();
+        }, 5000);
+
       }
     },
     //------------------------------------------------------------
@@ -875,7 +998,7 @@ const vm = new Vue({
     moneyInSafe() {
       let money = this.bank.money;
       money += this.moneyOfPlayers;
-
+      money += this.moneyInCustoms;
       return money;
     },
     /**
@@ -893,6 +1016,15 @@ const vm = new Vue({
     moneyInCirculation() {
       let money = MONEY;
       money -= this.moneyInSafe;
+      return money;
+    },
+    moneyInCustoms(){
+      let money = 0;
+      let lands = this.bank.lands;
+      money += lands.adventureLand.money;
+      money += lands.landOfTheBorder.money;
+      money += lands.landOfTheFuture.money;
+
       return money;
     },
     validateNewPlayer() {
