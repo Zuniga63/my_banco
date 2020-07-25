@@ -1,9 +1,9 @@
 /******************************************************
- * Logica de control de transacciones entre jugadores 
- * @author Andrés Zuñiga                              
- * Fecha de creacion: 18/07/2020 10:00:pm             
- * Ultima Actualizacion: 18/07/2020
+ * @fileoverview Logica de control de transacciones entre jugadores 
+ * @author Andrés Zuñiga <andres.zuniga.063@gmail.com>                             
  * @version 1.0
+ * Fecha de creacion: 18/07/2020 10:00:pm             
+ * Ultima Actualizacion: 25/07/2020
  * Historial:
  *  -La primera version fue escrita con Andres
 *******************************************************/
