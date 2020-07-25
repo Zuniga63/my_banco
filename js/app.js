@@ -244,7 +244,7 @@ class TransferModal {
 
 class TaxesView {
   constructor() {
-    this.visible = true;
+    this.visible = false;
     this.accountID = "";
     this.accountState = new State();
     this.taxDepartment = "";
@@ -271,7 +271,7 @@ class TaxesView {
 
 class LootView {
   constructor() {
-    this.visible = true;
+    this.visible = false;
     this.accountID = '';
     this.accountState = new State();
     this.departmentName = '';
@@ -354,6 +354,20 @@ const vm = new Vue({
       transfer: new TransferModal(),
       awardPrize: new awardPrizeModal(),
     },
+    views: {
+      dashboard: { name: 'Dashboard', icon: 'fas fa-chart-line' },
+      transfers: { name: 'Transferencia', icon: 'fas fa-random' },
+      transactions: { name: 'Transacción', icon: 'fas fa-money-bill-alt' },
+      salesAndBuy: { name: 'Ventas y Compras', icon: 'fas fa-cash-register' },
+      awards: { name: 'Premios', icon: 'fas fa-gift' },
+      taxes: { name: 'Impuestos', icon: 'fas fa-gavel' },
+      loots: { name: 'Botín', icon: 'fas fa-gift' },
+      // history: { name: 'Historial', icon: 'fas fa-book', visible: false },
+      // config: { name: 'Configuración', icon: 'fas fa-tools', visible: false },
+    },
+    actualView: '',
+
+
   },//Fin de data
   methods: {
     /**
@@ -370,8 +384,10 @@ const vm = new Vue({
           this.loby.bankerName = '';
           this.loby.password = '';
           this.loby.visibility = false;
-          this.dashBoard.visibility = true;
+          this.showView(this.views.dashboard.name)
         }
+
+        this.saveBank();
       }//Fin de if
     },//Fin del metodo
     /**
@@ -467,18 +483,76 @@ const vm = new Vue({
 
       return result;
     },
-    /**
-     * Agrega el formato de moneda al valor pasado como parametro
-     * @param {number} value Importe numerico
-     */
-    formatCurrency(value) {
-      var formatted = new Intl.NumberFormat('es-Co', {
-        style: 'currency',
-        currency: 'COP',
-        minimumFractionDigits: 0
-      }).format(value);
-      return formatted;
-    },//Fin del metodo, 
+    showMenuCollpased() {
+      const mainNavMenuCollapsed = document.getElementById('mainNavMenuCollapsed');
+      mainNavMenuCollapsed.classList.toggle('show');
+    },
+    onLinkClick(viewName) {
+      if (viewName !== this.actualView) {
+        this.hiddenActualView();
+        this.showView(viewName);
+        this.showMenuCollpased();
+      }
+    },
+    onBrandClick(){
+      if(this.views.dashboard.name !== this.actualView){
+        this.hiddenActualView();
+        this.showView(this.views.dashboard.name);
+      }
+    },
+    showView(viewName) {
+      //Se muestra la vista seleccionada
+      switch (viewName) {
+        case 'Dashboard': {
+          this.dashBoard.visibility = true;
+        } break;
+        case 'Transferencia': {
+          this.transfer.visible = true;
+        } break;
+        case 'Transacción': {
+          this.transaction.visible = true;
+        } break;
+        case 'Ventas y Compras': {
+          this.saleAndBuy.visible = true;
+        } break;
+        case 'Premios': {
+          this.awards.visible = true;
+        } break;
+        case 'Impuestos': {
+          this.taxesView.visible = true;
+        } break;
+        case 'Botín': {
+          this.lootView.visible = true;
+        } break;
+      }
+
+      this.actualView = viewName;
+    },
+    hiddenActualView() {
+      switch (this.actualView) {
+        case 'Dashboard': {
+          this.dashBoard.visibility = false;
+        } break;
+        case 'Transferencia': {
+          this.transfer.visible = false;
+        } break;
+        case 'Transacción': {
+          this.transaction.visible = false;
+        } break;
+        case 'Ventas y Compras': {
+          this.saleAndBuy.visible = false;
+        } break;
+        case 'Premios': {
+          this.awards.visible = false;
+        } break;
+        case 'Impuestos': {
+          this.taxesView.visible = false;
+        } break;
+        case 'Botín': {
+          this.lootView.visible = false;
+        } break;
+      }
+    },
     createNewPlayer() {
       let modal = this.modals.newPlayer;
       let playerName = modal.playerName.trim();
@@ -487,6 +561,7 @@ const vm = new Vue({
       process = this.bank.newPlayer(playerName, password);
       if (process.result) {
         modal.hidden();
+        this.saveBank();
       }//Fin de if
     },
     paySalary() {
@@ -496,6 +571,7 @@ const vm = new Vue({
         let process = this.bank.paySalary(player.id);
         if (process.result) {
           this.modals.paySalary.hidden();
+          this.saveBank();
         }
       }
     },//Fin del metodo
@@ -592,8 +668,9 @@ const vm = new Vue({
         modal.showAlert = true;
         modal.processState.hasError = false;
 
-        //Ahora reinicio los campos
+        //Ahora reinicio los campos y guardo el banco
         this.transfer.reset();
+        this.saveBank();
       } else {
         modal.showAlert = true;
         modal.processState.hasError = true;
@@ -666,6 +743,7 @@ const vm = new Vue({
             let process = this.bank.cashDeposit(acountID, amount);
             if (process.result) {
               this.transaction.reset();
+              this.saveBank();
 
               //Ahora se muestra la alerta
               this.transaction.showAlert = true;
@@ -689,6 +767,7 @@ const vm = new Vue({
 
             if (process.result) {
               this.transaction.reset();
+              this.saveBank();
 
               //Ahora se muestra la alerta
               this.transaction.showAlert = true;
@@ -764,6 +843,8 @@ const vm = new Vue({
             this.saleAndBuy.showAlert = true;
             if (process.result) {
               this.saleAndBuy.reset();
+              this.saveBank();
+
               this.saleAndBuy.processState.hasError = false;
               this.saleAndBuy.processState.message = "Venta realizada!";
             } else {
@@ -776,6 +857,7 @@ const vm = new Vue({
             this.saleAndBuy.showAlert = true;
             if (process.result) {
               this.saleAndBuy.reset();
+              this.saveBank();
               this.saleAndBuy.processState.hasError = false;
               this.saleAndBuy.processState.message = "Compra realizada!";
             } else {
@@ -882,6 +964,7 @@ const vm = new Vue({
           this.awards.process.message = "Premio Entregado";
           this.awards.showResult = true;
           this.awards.reset();
+          this.saveBank();
         } else {
           this.awards.process.hasError = true;
           this.awards.process.message = process.message;
@@ -975,6 +1058,7 @@ const vm = new Vue({
           this.taxesView.showAlert = true;
           this.taxesView.process.hasError = false;
           this.taxesView.process.message = "Transacción Exitosa!";
+          this.saveBank();
 
           this.taxesView.reset();
         } else {
@@ -1041,7 +1125,7 @@ const vm = new Vue({
       let departmentVal = this.validateLootDepartment();
       let amountVal = this.validateLootAmount();
 
-      if(accountVal && departmentVal && amountVal){
+      if (accountVal && departmentVal && amountVal) {
         let account = this.lootView.accountID;
         let department = this.lootView.departmentName;
         department = TaxType[department];
@@ -1049,12 +1133,13 @@ const vm = new Vue({
 
         let process = this.bank.loot(account, department, amount);
 
-        if(process.result){
+        if (process.result) {
           this.lootView.showAlert = true;
           this.lootView.process.hasError = false;
-          this.lootView.process.message ="Saqueo Satisfactorio";
+          this.lootView.process.message = "Saqueo Satisfactorio";
           this.lootView.reset();
-        }else{
+          this.saveBank();
+        } else {
           this.lootView.showAlert = true;
           this.lootView.process.hasError = true;
           this.lootView.process.message = process.message;
@@ -1076,6 +1161,21 @@ const vm = new Vue({
       value = parseFloat(value);
       return value;
     },
+    /**
+     * Agrega el formato de moneda al valor pasado como parametro
+     * @param {number} value Importe numerico
+     */
+    formatCurrency(value) {
+      var formatted = new Intl.NumberFormat('es-Co', {
+        style: 'currency',
+        currency: 'COP',
+        minimumFractionDigits: 0
+      }).format(value);
+      return formatted;
+    },//Fin del metodo
+    saveBank(){
+      localStorage.bank = JSON.stringify(this.bank);
+    }
   },//Fin de methods
   computed: {
     /**
@@ -1154,19 +1254,19 @@ const vm = new Vue({
   },//Fin de computed
   created() {
     this.loby.visibility = true;
-    //El siguiente codigo es para que se salte el loby
-    this.loby.bankerName = "Andrés Felipe";
-    this.loby.password = "0000";
-    this.startNewGame();
-    //Para estar cerca al maximo numero de jugadores
-    this.bank.newPlayer('Julian', '0000');
-    this.bank.newPlayer('Juliana', '0000');
-    this.bank.newPlayer('Fransika', '0000');
-    this.bank.newPlayer('Magnus', '0000');
-    this.bank.newPlayer('Mikkel', '0000');
-    this.bank.newPlayer('Jhonas', '0000');
-    this.bank.newPlayer('Martha', '0000');
-    this.bank.newPlayer('Adan', '0000');
-    this.bank.newPlayer('Eva', '0000');
+    // //El siguiente codigo es para que se salte el loby
+    // this.loby.bankerName = "Andrés Felipe";
+    // this.loby.password = "0000";
+    // this.startNewGame();
+    // //Para estar cerca al maximo numero de jugadores
+    // this.bank.newPlayer('Julian', '0000');
+    // this.bank.newPlayer('Juliana', '0000');
+    // this.bank.newPlayer('Fransika', '0000');
+    // this.bank.newPlayer('Magnus', '0000');
+    // this.bank.newPlayer('Mikkel', '0000');
+    // this.bank.newPlayer('Jhonas', '0000');
+    // this.bank.newPlayer('Martha', '0000');
+    // this.bank.newPlayer('Adan', '0000');
+    // this.bank.newPlayer('Eva', '0000');
   },//Fin de create
 })

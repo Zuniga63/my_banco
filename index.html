@@ -109,27 +109,21 @@
               src="./img/bank.svg"
               alt="Logo de la aplicacion"
               class="main-nav__brand"
+              @click="onBrandClick"
             />
-            <nav class="main-nav__nav">
+            <nav class="main-nav__nav" id="mainNavMenuCollapsed">
               <ul class="main-nav__list">
-                <li class="main-nav__item">
-                  <a href="#" class="main_nav__link main-nav__link--active">
-                    <span class="main-nav__link__prepend">i</span>
-                    <span class="main-nav__link__content">Link 1</span>
-                  </a>
-                </li>
-
-                <li class="main-nav__item">
-                  <a href="#" class="main_nav__link">
-                    <span class="main-nav__link__prepend">i</span>
-                    <span class="main-nav__link__content">Link 2</span>
-                  </a>
-                </li>
-
-                <li class="main-nav__item">
-                  <a href="#" class="main_nav__link main-nav__link--disabled">
-                    <span class="main-nav__link__prepend">i</span>
-                    <span class="main-nav__link__content">Link 3</span>
+                <li
+                  class="main-nav__item"
+                  v-for="item in views"
+                >
+                  <a
+                    href="#"
+                    :class="['main-nav__link', {'main-nav__link--active' : item.name === actualView}]"
+                    @click="onLinkClick(item.name)"
+                  >
+                    <i :class="['main-nav__link__prepend', item.icon]"></i>
+                    <span class="main-nav__link__body">{{item.name}}</span>
                   </a>
                 </li>
               </ul>
@@ -138,7 +132,7 @@
             </nav>
             <!--Fin de main-nav-nav-->
 
-            <button class="main-nav__toggler">
+            <button class="main-nav__toggler" @click="showMenuCollpased">
               <i class="fas fa-bars"></i>
             </button>
           </div>
@@ -1005,7 +999,8 @@
               ></input-money>
 
               <span
-                class="alert alert--danger" style="margin-top: -1em;"
+                class="alert alert--danger"
+                style="margin-top: -1em;"
                 :class="{show: lootView.amountState.hasError}"
                 >Ingresa un valor valido</span
               >
@@ -1015,7 +1010,9 @@
                 :class="{'alert--danger': lootView.process.hasError, 'alert--success': !lootView.process.hasError, show: lootView.showAlert}"
                 >{{lootView.process.message}}</span
               >
-              <button class="btn btn--success" @click="payLooting">Saquear</button>
+              <button class="btn btn--success" @click="payLooting">
+                Saquear
+              </button>
             </div>
           </div>
         </div>
