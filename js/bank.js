@@ -771,4 +771,99 @@ class Bank extends Acount {
 
     return res;
   }
+
+  /**
+   * Carga los datos que se pasan como parametro
+   * @param {Bank} data Datos de guardado en localstorage
+   */
+  loadData(data) {
+    /**
+     * En primer lugar creo los datos de los jugadores
+     * que actualiza tambien el utlimo id
+     */
+    for (let index = 0; index < data.players.length; index++) {
+      const dataPlayer = data.players[index];
+
+      if (index === 0) {
+        this.createTheBanker(dataPlayer.name, dataPlayer.password);
+      } else {
+        this.newPlayer(dataPlayer.name, dataPlayer.password);
+      }
+
+      let realPlayer = this.players[index];
+
+      //Se agreagan las transacciones pero antes se eliminan las existente
+      while(realPlayer.transacctions.length > 0){
+        realPlayer.transacctions.pop();
+      }
+
+      dataPlayer.transacctions.forEach(t => {
+        let transaction = new Transacction(t.date, t.description, t.amount);
+        realPlayer.transacctions.push(transaction);
+      });
+
+      //Se actualiza el score de los premios
+      realPlayer.awards.pinocchio.score = dataPlayer.awards.pinocchio.score;
+      realPlayer.awards.daisy.score = dataPlayer.awards.daisy.score;
+      realPlayer.awards.bambi.score = dataPlayer.awards.bambi.score;
+      realPlayer.awards.cinderella.score = dataPlayer.awards.cinderella.score;
+
+      //Se actualiza el dinero
+      realPlayer.money = dataPlayer.money;
+    }
+
+    /**
+     * Ahora se actulizan los puestos de aduanas, los campos a axtualizar
+     * +money
+     * +transacctions
+     */
+    let land = this.lands.adventureLand;
+    let landSource = data.lands.adventureLand;
+
+    land.money = landSource.money;
+    landSource.transacctions.forEach(t => {
+      let newTransaction = new Transacction(t.date, t.description, t.amount);
+      land.transacctions.push(newTransaction);
+    })
+
+    land = this.lands.landOfTheFuture;
+    landSource = data.lands.landOfTheFuture;
+
+    land.money = landSource.money;
+    landSource.transacctions.forEach(t => {
+      let newTransaction = new Transacction(t.date, t.description, t.amount);
+      land.transacctions.push(newTransaction);
+    })
+
+    land = this.lands.landOfTheBorder;
+    landSource = data.lands.landOfTheBorder;
+
+    land.money = landSource.money;
+    landSource.transacctions.forEach(t => {
+      let newTransaction = new Transacction(t.date, t.description, t.amount);
+      land.transacctions.push(newTransaction);
+    })
+
+    /**
+     * Ahora se actualizan los score de los premios
+     */
+    this.awards.pinocchio.score = data.awards.pinocchio.score;
+    this.awards.daisy.score = data.awards.daisy.score;
+    this.awards.bambi.score = data.awards.bambi.score;
+    this.awards.cinderella.score = data.awards.cinderella.score;
+
+    /**
+     * Actualizar el dinero del banco y las transacciones
+     */
+    this.money = data.money;
+
+    while(this.transacctions.length > 0){
+      this.transacctions.pop();
+    }
+
+    data.transacctions.forEach(t => {
+      let newTransaction = new Transacction(t.date, t.description, t.amount);
+      this.transacctions.push(newTransaction);
+    })
+  }
 }

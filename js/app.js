@@ -390,6 +390,10 @@ const vm = new Vue({
         this.saveBank();
       }//Fin de if
     },//Fin del metodo
+    restarGame(){
+      localStorage.removeItem('bank');
+      location.reload();
+    },
     /**
      * Verifica que el nombre del banquero sea minimo de tres letras
      * y actualiza el estado del campo
@@ -1253,7 +1257,13 @@ const vm = new Vue({
     },
   },//Fin de computed
   created() {
-    this.loby.visibility = true;
+    if(localStorage.bank){
+      this.bank.loadData(JSON.parse(localStorage.bank));
+      this.loby.visibility = false;
+      this.onBrandClick();
+    }else{
+      this.loby.visibility = true;
+    }
     // //El siguiente codigo es para que se salte el loby
     // this.loby.bankerName = "Andrés Felipe";
     // this.loby.password = "0000";
