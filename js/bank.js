@@ -716,34 +716,53 @@ class Bank extends Acount {
 
       if (playerExist) {
         let player = this.players.filter(p => p.id === playerID)[0];
-        if (this.money >= amount) {
-          if (landName === TaxType.bank || landName === TaxType.landOfTheBorder
-            || landName === TaxType.landOfTheFuture || landName === TaxType.adventureLand) {
-            //Abono el dinero al jugador
-            player.cashDeposit(amount);
+        if (landName === TaxType.bank || landName === TaxType.landOfTheBorder
+          || landName === TaxType.landOfTheFuture || landName === TaxType.adventureLand) {
+          //Abono el dinero al jugador
 
-            //Descuento el dinero segun el tipo de impuesto
-            switch (landName) {
-              case TaxType.bank:
+          //Descuento el dinero segun el tipo de impuesto
+          switch (landName) {
+            case TaxType.bank: {
+              if (this.money >= amount) {
+                player.cashDeposit(amount);
                 super.cashWhitdrawal(amount);
-                break;
-              case TaxType.landOfTheFuture:
+                res.result = true;
+              } else {
+                res.message = "Saldo insuficiente";
+              }
+            } break;
+            case TaxType.landOfTheFuture: {
+              if (this.lands.landOfTheFuture.money >= amount) {
+                player.cashDeposit(amount);
                 this.lands.landOfTheFuture.cashWhitdrawal(amount);
-                break;
-              case TaxType.landOfTheBorder:
+                res.result = true;
+              } else {
+                res.message = "Saldo insuficiente";
+              }
+            } break;
+            case TaxType.landOfTheBorder: {
+              if (this.lands.landOfTheBorder.money >= amount) {
+                player.cashDeposit(amount);
                 this.lands.landOfTheBorder.cashWhitdrawal(amount);
-                break;
-              case TaxType.adventureLand:
+                res.result = true;
+              } else {
+                res.message = "Saldo insuficiente";
+              }
+            } break;
+            case TaxType.adventureLand: {
+              if (this.lands.adventureLand.money >= amount) {
+                player.cashDeposit(amount);
                 this.lands.adventureLand.cashWhitdrawal(amount);
-                break;
-            }//Fin de swith
+                res.result = true;
+              } else {
+                res.message = "Saldo insuficiente";
+              }
+            } break;
+          }//Fin de swith
 
-            res.result = true;
-          } else {
-            res.message = "No se seleccionó impuesto";
-          }
+          // res.result = true;
         } else {
-          res.message = "Saldo insuficiente";
+          res.message = "No se seleccionó impuesto";
         }
       } else {
         res.message = "El jugador no existe";

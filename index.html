@@ -264,18 +264,30 @@
                   <h2 class="dashboard-card__title">Departamento de Aduanas</h2>
                   <div class="dashboard-card__body">
                     <p class="dashboard-card__section">
-                      {{bank.lands.landOfTheBorder.name}}: <span class="text-bold">{{formatCurrency(bank.lands.landOfTheBorder.money)}}</span>
+                      {{bank.lands.landOfTheBorder.name}}:
+                      <span class="text-bold"
+                        >{{formatCurrency(bank.lands.landOfTheBorder.money)}}</span
+                      >
                     </p>
                     <p class="dashboard-card__section">
-                      {{bank.lands.landOfTheFuture.name}}: <span class="text-bold">{{formatCurrency(bank.lands.landOfTheFuture.money)}}</span>
+                      {{bank.lands.landOfTheFuture.name}}:
+                      <span class="text-bold"
+                        >{{formatCurrency(bank.lands.landOfTheFuture.money)}}</span
+                      >
                     </p>
                     <p class="dashboard-card__section">
-                      {{bank.lands.adventureLand.name}}: <span class="text-bold">{{formatCurrency(bank.lands.adventureLand.money)}}</span>
+                      {{bank.lands.adventureLand.name}}:
+                      <span class="text-bold"
+                        >{{formatCurrency(bank.lands.adventureLand.money)}}</span
+                      >
                     </p>
                   </div>
                   <!-- Fin del body -->
                   <p class="dashboard-card__footer">
-                    Dinero: <span class="text-bold">{{formatCurrency(moneyInCustoms)}}</span>
+                    Dinero:
+                    <span class="text-bold"
+                      >{{formatCurrency(moneyInCustoms)}}</span
+                    >
                   </p>
                 </div>
                 <!-- Fin de la tarjeta -->
@@ -902,12 +914,14 @@
                 >{{taxesView.process.message}}</span
               >
               <br />
-              <button class="btn btn--success" @click="collectTheTax">Cobrar Impuesto</button>
+              <button class="btn btn--success" @click="collectTheTax">
+                Cobrar Impuesto
+              </button>
             </div>
           </div>
         </div>
 
-        <div class="loot">
+        <div class="loot" v-show="lootView.visible">
           <div class="container">
             <div class="container__header">
               <h1 class="container__title">Cobrar Botín</h1>
@@ -917,35 +931,91 @@
               <label for="lootType" class="form__label"
                 >Departamento a saquear</label
               >
-              <select name="lootType" id="lootType" class="form__input">
+              <select
+                name="lootType"
+                id="lootType"
+                class="form__input"
+                v-model="lootView.departmentName"
+                @blur="validateLootDepartment"
+                @change="validateLootDepartment"
+              >
                 <option value="" selected disabled
                   >Selecciona al departamento</option
                 >
-                <option value="1">Banco</option>
-                <option value="1">Tierra de la Fantasía</option>
-                <option value="1">Tierra de la Aventura</option>
-                <option value="1">Tierra de la frontera</option>
+                <option value="bank">Banco</option>
+                <option value="landOfTheFuture"
+                  >Tierra del Futuro
+                  ({{formatCurrency(bank.lands.landOfTheFuture.money)}})</option
+                >
+                <option value="adventureLand"
+                  >Tierra de la Aventura
+                  ({{formatCurrency(bank.lands.adventureLand.money)}})</option
+                >
+                <option value="landOfTheBorder"
+                  >Tierra de la frontera
+                  ({{formatCurrency(bank.lands.landOfTheBorder.money)}})</option
+                >
               </select>
+
+              <span
+                class="alert alert--danger"
+                :class="{show: lootView.departmentNameState.hasError}"
+              >
+                Selecciona uno de los departamentos
+              </span>
+
+              <!-- Seleccionar el nombre del saquedor -->
+              <label for="lootAccount" class="form__label">Saqueador</label>
+
+              <select
+                name="lootAccount"
+                id="lootAccount"
+                class="form__input"
+                v-model="lootView.accountID"
+                @blur="validateLootAccount"
+                @change="validateLootAccount"
+              >
+                <option value="" selected disabled
+                  >Selecciona un Jugador</option
+                >
+                <option
+                  v-for="player in bank.players"
+                  :value="player.id"
+                  :key="player.id"
+                  >{{player.name}}</option
+                >
+              </select>
+
+              <span
+                class="alert alert--danger"
+                :class="{show: lootView.accountState.hasError}"
+              >
+                Selecciona a un Jugador
+              </span>
 
               <!-- Ingresa el valor del impuesto -->
               <label for="lootAmount" class="form__label text-center"
                 >Valor a saquear</label
               >
-              <input
-                type="text"
-                name="lootAmount"
+
+              <input-money
                 id="lootAmount"
-                class="form__input text-right"
-                placeholder="$0"
-              />
-              <span class="alert alert--danger show"
+                v-model="lootView.amount"
+                @blur="validateLootAmount"
+              ></input-money>
+
+              <span
+                class="alert alert--danger" style="margin-top: -1em;"
+                :class="{show: lootView.amountState.hasError}"
                 >Ingresa un valor valido</span
               >
 
-              <span class="alert alert--big alert--success show"
-                >Saqueo Exitoso</span
+              <span
+                class="alert alert--big"
+                :class="{'alert--danger': lootView.process.hasError, 'alert--success': !lootView.process.hasError, show: lootView.showAlert}"
+                >{{lootView.process.message}}</span
               >
-              <button class="btn btn--success">Saquear</button>
+              <button class="btn btn--success" @click="payLooting">Saquear</button>
             </div>
           </div>
         </div>

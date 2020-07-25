@@ -269,6 +269,29 @@ class TaxesView {
   }
 }
 
+class LootView {
+  constructor() {
+    this.visible = true;
+    this.accountID = '';
+    this.accountState = new State();
+    this.departmentName = '';
+    this.departmentNameState = new State();
+    this.amount = '';
+    this.amountState = new State();
+    this.process = new State();
+    this.showAlert = false;
+  }
+
+  reset() {
+    this.accountID = '';
+    this.accountState.reset();
+    this.departmentName = '';
+    this.departmentNameState.reset();
+    this.amount = '';
+    this.amountState.reset();
+  }
+}
+
 Vue.component('input-money', {
   props: ['value'],
   template: `
@@ -324,6 +347,7 @@ const vm = new Vue({
     saleAndBuy: new SaleAndBuy(),
     awards: new AwardsView(),
     taxesView: new TaxesView(),
+    lootView: new LootView(),
     modals: {
       newPlayer: new NewPlayerModal(),
       paySalary: new PaySalaryModal(),
@@ -947,13 +971,13 @@ const vm = new Vue({
 
         let process = this.bank.colletTax(taxPayerId, taxDepartment, amount, password);
 
-        if(process.result){
+        if (process.result) {
           this.taxesView.showAlert = true;
           this.taxesView.process.hasError = false;
-          this.taxesView.process.message ="Transacción Exitosa!";
+          this.taxesView.process.message = "Transacción Exitosa!";
 
           this.taxesView.reset();
-        }else{
+        } else {
           this.taxesView.showAlert = true;
           this.taxesView.process.hasError = true;
           this.taxesView.process.message = process.message;
@@ -964,6 +988,82 @@ const vm = new Vue({
           this.taxesView.process.reset();
         }, 5000);
 
+      }
+    },
+    //------------------------------------------------------------
+    //METODOS PARA COBRAR SAQUEOS
+    //------------------------------------------------------------
+    validateLootAccount() {
+      let result = false;
+      let account = this.lootView.accountID;
+      let state = this.lootView.accountState;
+      let accountExist = this.bank.players.some(p => p.id === account);
+
+      if (accountExist) {
+        state.reset();
+        result = true;
+      } else {
+        state.hasError = true;
+      }
+
+      return result;
+    },
+    validateLootDepartment() {
+      let result = false;
+      let taxDepartment = this.lootView.departmentName;
+      let state = this.lootView.departmentNameState;
+
+      if (taxDepartment === 'bank' || taxDepartment === 'adventureLand' || taxDepartment == 'landOfTheFuture' || taxDepartment === 'landOfTheBorder') {
+        state.reset();
+        result = true;
+      } else {
+        state.hasError = true;
+      }
+
+      return result;
+    },
+    validateLootAmount() {
+      let result = false;
+      let amount = this.deleteCurrencyFormater(this.lootView.amount);
+      let state = this.lootView.amountState;
+
+      if (!isNaN(amount) && amount > 0) {
+        state.reset();
+        result = true;
+      } else {
+        state.hasError = true;
+      }
+
+      return result;
+    },
+    payLooting() {
+      let accountVal = this.validateLootAccount();
+      let departmentVal = this.validateLootDepartment();
+      let amountVal = this.validateLootAmount();
+
+      if(accountVal && departmentVal && amountVal){
+        let account = this.lootView.accountID;
+        let department = this.lootView.departmentName;
+        department = TaxType[department];
+        let amount = this.deleteCurrencyFormater(this.lootView.amount);
+
+        let process = this.bank.loot(account, department, amount);
+
+        if(process.result){
+          this.lootView.showAlert = true;
+          this.lootView.process.hasError = false;
+          this.lootView.process.message ="Saqueo Satisfactorio";
+          this.lootView.reset();
+        }else{
+          this.lootView.showAlert = true;
+          this.lootView.process.hasError = true;
+          this.lootView.process.message = process.message;
+        }
+
+        setTimeout(() => {
+          this.lootView.showAlert = false;
+          this.lootView.process.reset();
+        }, 5000);
       }
     },
     //------------------------------------------------------------
@@ -1018,7 +1118,7 @@ const vm = new Vue({
       money -= this.moneyInSafe;
       return money;
     },
-    moneyInCustoms(){
+    moneyInCustoms() {
       let money = 0;
       let lands = this.bank.lands;
       money += lands.adventureLand.money;
