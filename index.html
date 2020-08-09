@@ -567,8 +567,8 @@
 
               <!-- Seleccion del titular -->
               <label for="acountOfTransaction" class="form__label"
-                >{{saleAndBuy.operationType==='sale' ? 'Vendedor' :
-                'Comprador'}}</label
+                >{{saleAndBuy.operationType==='sale' ? 'Comprador' :
+                'Vendedor'}}</label
               >
               <select
                 name="acountOfTransaction"
@@ -579,7 +579,7 @@
               >
                 <option value="" selected disabled
                   >Selecciona al {{saleAndBuy.operationType==='sale' ?
-                  'Vendedor' : 'Comprador'}}</option
+                  'Comprador' : 'Vendedor'}}</option
                 >
                 <option
                   v-for="player in bank.players"
@@ -683,6 +683,7 @@
                   class="form__input"
                   placeholder="Ingresa la contraseña"
                   style="margin-bottom: 1em;"
+                  @focus="$event.target.select()"
                   v-model="saleAndBuy.password"
                 />
               </template>

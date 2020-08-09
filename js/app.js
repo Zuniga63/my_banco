@@ -118,6 +118,7 @@ class SaleAndBuy {
     this.assetType = 'title';
     this.amount = '';
     this.amountState.reset();
+    this.password = '';
     // this.processState.reset();
     // this.showAlert = false;
   }
@@ -861,6 +862,7 @@ const vm = new Vue({
 
               this.saleAndBuy.processState.hasError = false;
               this.saleAndBuy.processState.message = "Venta realizada!";
+              this.saleAndBuy.password = '';
             } else {
               this.saleAndBuy.processState.hasError = true;
               this.saleAndBuy.processState.message = process.message;
@@ -874,6 +876,7 @@ const vm = new Vue({
               this.saveBank();
               this.saleAndBuy.processState.hasError = false;
               this.saleAndBuy.processState.message = "Compra realizada!";
+              this.saleAndBuy.password = '';
             } else {
               this.saleAndBuy.processState.hasError = true;
               this.saleAndBuy.processState.message = process.message;
