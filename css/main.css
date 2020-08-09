@@ -219,7 +219,7 @@ body {
   display: block;
   width: 100%;
   margin-bottom: 5px;
-  padding: 3px 5px;
+  padding: 5px 10px;
 }
 
 .form__input:focus,
@@ -334,6 +334,7 @@ body {
 }
 
 .loby-card__img {
+  width: 100%;
   display: block;
   max-width: 100px;
 }
@@ -743,8 +744,16 @@ body {
   }
 }
 
-@media (min-width: 768px){
+@media (min-width: 600px){
   body{
     font-size: 22px;
+  }
+
+  .loby-card{
+    max-width: 500px;
+  }
+
+  .loby-card__img{
+    max-width: 200px;
   }
 }
