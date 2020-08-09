@@ -1,0 +1,11 @@
+CACHE MANIFEST
+# [versión/fecha]
+index.html
+js/app.js
+js/bank.js
+js/vue.js
+css/main.css
+css/normalize.css
+img/bank.svg
+img/loby_bg_min.jpg
+img/TioMacPato.png
