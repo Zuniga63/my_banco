@@ -573,7 +573,7 @@ const vm = new Vue({
       let playerName = modal.playerName.trim();
       let password = modal.password.trim();
 
-      process = this.bank.newPlayer(playerName, password);
+      process = this.bank.newPlayer(playerName);
       if (process.result) {
         modal.hidden();
         this.saveBank();
@@ -677,7 +677,7 @@ const vm = new Vue({
       let amount = modal.amount;
       let password = modal.senderPassword;
 
-      let process = this.bank.moneyTransfer(senderID, password, amount, addressedID);
+      let process = this.bank.moneyTransfer(senderID, amount, addressedID);
 
       if (process.result) {
         modal.showAlert = true;
@@ -854,7 +854,7 @@ const vm = new Vue({
 
         switch (operationType) {
           case 'sale': {
-            process = this.bank.sellAsset(acountID, password, assetType, amount);
+            process = this.bank.sellAsset(acountID, assetType, amount);
             this.saleAndBuy.showAlert = true;
             if (process.result) {
               this.saleAndBuy.reset();
@@ -1059,9 +1059,8 @@ const vm = new Vue({
       let taxPayerVal = this.validateTaxPayer();
       let departmentVal = this.validateTaxDepartment();
       let amountVal = this.validateTaxAmount();
-      let passwordVal = this.validatePassword();
 
-      if (taxPayerVal && departmentVal && amountVal && passwordVal) {
+      if (taxPayerVal && departmentVal && amountVal) {
         let taxPayerId = this.taxesView.accountID;
         let taxDepartment = this.taxesView.taxDepartment;
         let amount = this.deleteCurrencyFormater(this.taxesView.amount);
@@ -1069,7 +1068,7 @@ const vm = new Vue({
 
         taxDepartment = TaxType[taxDepartment];
 
-        let process = this.bank.colletTax(taxPayerId, taxDepartment, amount, password);
+        let process = this.bank.colletTax(taxPayerId, taxDepartment, amount);
 
         if (process.result) {
           this.taxesView.showAlert = true;
@@ -1250,7 +1249,7 @@ const vm = new Vue({
       let playerName = modal.playerName.trim();
       let password = modal.password.trim();
 
-      if (playerName && playerName.length >= 3 && password && password.length >= 4) {
+      if (playerName && playerName.length >= 3) {
         result = true
       }//Fin de if
       return result;

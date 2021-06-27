@@ -311,7 +311,7 @@ class Bank extends Acount {
    * @param {string} bankerName Nombre del banquero
    * @param {string} password Contraseña del banquero
    */
-  createTheBanker(bankerName, password) {
+  createTheBanker(bankerName, password = '0000') {
     let res = new Result();
 
     if (!this.banker) {
@@ -334,7 +334,7 @@ class Bank extends Acount {
    * @param {string} playerName Nombre del nuevo jugador
    * @param {string} password Contraseña del nuevo jugador
    */
-  newPlayer(playerName, password) {
+  newPlayer(playerName, password = '0000') {
     let res = new Result();
     //Los dos parametros deben ser cadena de texto
     if (typeof playerName === 'string' && typeof password === 'string') {
@@ -415,7 +415,7 @@ class Bank extends Acount {
    * @param {number} amount Importe a transferir
    * @param {number} addressedID Identificador del jugador que recibe la transferencia
    */
-  moneyTransfer(senderID, senderPassword, amount, addressedID) {
+  moneyTransfer(senderID, amount, addressedID) {
     let res = new Result();
     let senderExist = this.players.some(p => p.id === senderID);
     let addressedExist = this.players.some(p => p.id === senderID);
@@ -424,7 +424,7 @@ class Bank extends Acount {
       let sender = this.players.filter(p => p.id === senderID)[0];
       let addressed = this.players.filter(p => p.id === addressedID)[0];
 
-      if (sender.password === senderPassword) {
+      if (true) {
         if (typeof amount === "number" && amount > 0) {
           if (sender.money >= amount) {
             //Se retira el dinero del remitente
@@ -487,7 +487,6 @@ class Bank extends Acount {
     if (
       playerID
       && typeof playerID === 'number'
-      && password
       && amount
       && typeof amount === 'number'
       && amount > 0) {
@@ -495,7 +494,7 @@ class Bank extends Acount {
 
       if (playerExist) {
         let player = this.players.filter(p => p.id === playerID)[0];
-        if (player.password === password) {
+        if (true) {
           if (player.money >= amount) {
             player.cashWhitdrawal(amount);
             res.result = true;
@@ -521,16 +520,16 @@ class Bank extends Acount {
    * @param {string} assetType Nombre del tipo de activo
    * @param {number} value El valor del activo vendido
    */
-  sellAsset(playerID, password, assetType, value) {
+  sellAsset(playerID, assetType, value) {
     let res = new Result();
 
-    if (playerID && typeof playerID === "number" && password && assetType && value && typeof value === 'number' && value > 0) {
+    if (playerID && typeof playerID === "number" && assetType && value && typeof value === 'number' && value > 0) {
       let playerExist = this.players.some(p => p.id === playerID);
 
       if (playerExist) {
         let player = this.players.filter(p => p.id === playerID)[0];
 
-        if (player.password === password) {
+        if (true) {
           if (player.money >= value) {
             //descuento el dinero de la cuenta del jugador
             player.cashWhitdrawal(value);
@@ -653,7 +652,7 @@ class Bank extends Acount {
    * @param {string} taxName Nombre del impuesto
    * @param {number} amount Valor del impuesto
    */
-  colletTax(playerID, taxName, amount, playerPassword) {
+  colletTax(playerID, taxName, amount) {
     let res = new Result();
 
     if (playerID && typeof playerID === 'number' && taxName && amount && typeof amount === 'number' && amount > 0) {
@@ -661,7 +660,7 @@ class Bank extends Acount {
 
       if (playerExist) {
         let player = this.players.filter(p => p.id === playerID)[0];
-        if (player.password === playerPassword) {
+        if (true) {
           if (player.money >= amount) {
             if (taxName === TaxType.bank || taxName === TaxType.landOfTheBorder
               || taxName === TaxType.landOfTheFuture || taxName === TaxType.adventureLand) {

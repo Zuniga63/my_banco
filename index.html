@@ -18,7 +18,7 @@
     <!-- Cdn de fontawesome -->
     <link
       rel="stylesheet"
-      href="./css/all.min.css"
+      href="./fontawesome-free/css/all.min.css"
     />
 
     <!-- Estilos personalizados -->
@@ -500,21 +500,6 @@
                 >{{transaction.amountState.message}}</span
               >
 
-              <template v-if="transaction.type === 'whitdrawal'">
-                <label for="transactionPassword" class="form__label"
-                  >Contraseña</label
-                >
-                <input
-                  type="password"
-                  name="transctionPassword"
-                  id="transactionPassword"
-                  class="form__input"
-                  placeholder="Ingresa la contraseña"
-                  style="margin-bottom: 1em;"
-                  v-model="transaction.password"
-                />
-              </template>
-
               <span
                 :class="['alert', 'alert--big', {'alert--danger': transaction.process.hasError, 'alert--success': !transaction.process.hasError, show: transaction.showAlert}]"
                 >{{transaction.process.message}}</span
@@ -674,7 +659,7 @@
                 >Ingresa un valor valido</span
               >
 
-              <template v-if="saleAndBuy.operationType === 'sale'">
+              <!-- <template v-if="saleAndBuy.operationType === 'sale'">
                 <label for="salePassword" class="form__label">Contraseña</label>
                 <input
                   type="password"
@@ -686,7 +671,7 @@
                   @focus="$event.target.select()"
                   v-model="saleAndBuy.password"
                 />
-              </template>
+              </template> -->
 
               <span
                 :class="['alert', 'alert--big', {'alert--success': !saleAndBuy.processState.hasError, 'alert--danger': saleAndBuy.processState.hasError, show: saleAndBuy.showAlert}]"
@@ -884,7 +869,7 @@
               >
 
               <!-- Ingreso de la contraseña -->
-              <label for="taxPassword" class="form__label text-center text-bold"
+              <!-- <label for="taxPassword" class="form__label text-center text-bold"
                 >Contraseña</label
               >
 
@@ -895,7 +880,7 @@
                 class="form__input"
                 v-model="taxesView.password"
                 @blur="validatePassword"
-              />
+              /> -->
 
               <span
                 class="alert alert--danger"
@@ -1049,7 +1034,7 @@
               id="newPlayerPassword"
               class="form__input"
               v-model.trim="modals.newPlayer.password"
-              @blur="validatePlayerPassword"
+              
               placeholder="Contraseña"
             />
             <span
@@ -1118,14 +1103,6 @@
                   >{{formatCurrency(modals.transfer.amount)}}</span
                 >
               </p>
-
-              <input
-                type="password"
-                name="password"
-                placeholder="Ingresa la contraseña"
-                class="form__input"
-                v-model="modals.transfer.senderPassword"
-              />
             </div>
 
             <span
@@ -1136,7 +1113,6 @@
             <button
               class="btn btn--success"
               @click="makeTransfer"
-              :disabled="modals.transfer.senderPassword.length <= 3"
             >
               Hacer Transferencia
             </button>
